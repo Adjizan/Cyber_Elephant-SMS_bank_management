@@ -13,6 +13,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
@@ -68,3 +69,14 @@ fun BankManagementTestTheme(
         content = content
     )
 }
+
+val xSmallMargin = 4.dp
+val smallMargin = 6.dp
+val normalMargin = 8.dp
+val largeMargin = 10.dp
+val xLargeMargin = 12.dp
+val xxLargeMargin = 16.dp
+val xxxLargeMargin = 24.dp
+
+val horizontalMargin = normalMargin * 2
+val verticalMargin = normalMargin * 2
