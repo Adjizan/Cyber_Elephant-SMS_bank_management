@@ -1,10 +1,14 @@
-package com.cyberelephant.bank.presentation
+package com.cyberelephant.bank.presentation.accounts
 
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.pm.ActivityInfo
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -28,12 +32,29 @@ fun BankAccountPage(navController: NavHostController, modifier: Modifier) {
         }
     })
 
-
-    Column(modifier = modifier) {
-        Text(text = "Je suis sur les comptes en banque")
+    // TODO
+    val uiBankAccounts = (0..50).map {
+        UiBankAccount("Pseudo $it", (-5000..5000).random())
+    }.toList()
+    LazyColumn {
+        items(uiBankAccounts) {
+            BankAccountRow(it)
+        }
     }
-
 }
+
+@Composable
+fun BankAccountRow(uiBankAccount: UiBankAccount) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Text(text = uiBankAccount.pseudo)
+        Text(text = "${uiBankAccount.balance}")
+    }
+}
+
+data class UiBankAccount(val pseudo: String, val balance: Int)
 
 internal fun Context.findActivity(): Activity {
     var context = this
