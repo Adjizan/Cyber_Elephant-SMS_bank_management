@@ -70,13 +70,13 @@ fun BankManagementTestTheme(
     )
 }
 
-val xSmallMargin = 4.dp
-val smallMargin = 6.dp
-val normalMargin = 8.dp
-val largeMargin = 10.dp
-val xLargeMargin = 12.dp
-val xxLargeMargin = 16.dp
-val xxxLargeMargin = 24.dp
+val xSmallMargin = 6.dp
+val smallMargin = 8.dp
+val normalMargin = 12.dp
+val largeMargin = 16.dp
+val xLargeMargin = 20.dp
+val xxLargeMargin = 24.dp
+val xxxLargeMargin = 40.dp
 
 val horizontalMargin = normalMargin * 2
 val verticalMargin = normalMargin * 2

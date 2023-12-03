@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">CE - SMS bank management</string>
+    <string name="bank_account_title">Comptes en banque</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
