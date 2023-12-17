@@ -58,7 +58,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                         originatingAddress
                     )
 
-                    HelpCommand -> "Aide"
+                    HelpCommand -> TODO()
                     NewUserCommand -> {
                         handleNewUser(
                             context,
@@ -68,9 +68,9 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                         )
                     }
 
-                    TransferCommand -> "Transfet"
+                    TransferCommand -> TODO()
                 }
-            } ?: "NOPE !"
+            } ?: { TODO() }
         }
 
     }
@@ -78,12 +78,12 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
     private fun handleConsultBalance(context: Context, phoneNumber: String) {
         lateinit var message: String
         goAsync(callback = {
-            Toast.makeText(
+            operationCallback(
                 context,
                 context.getString(R.string.consult_balance_internal_feedback, phoneNumber),
-                Toast.LENGTH_SHORT
-            ).show()
-            sendSms(context, message, phoneNumber)
+                message,
+                phoneNumber
+            )
         }) {
             message = try {
                 context.getString(
@@ -99,6 +99,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
         }
     }
 
+
     private fun handleNewUser(
         context: Context,
         command: Command,
@@ -108,12 +109,12 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
         lateinit var feedback: String
         lateinit var feedbackForUser: String
         goAsync(callback = {
-            Toast.makeText(
+            operationCallback(
                 context,
                 feedback,
-                Toast.LENGTH_SHORT
-            ).show()
-            sendSms(context, feedbackForUser, phoneNumber)
+                feedbackForUser,
+                phoneNumber
+            )
         }) {
             val bankAccount = command.verify(message.toString())!!.groups[1]!!.value
             try {
@@ -159,6 +160,21 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
             }
         }
     }
+
+    private fun operationCallback(
+        context: Context,
+        internalFeedback: String,
+        userFeedback: String,
+        phoneNumber: String
+    ) {
+        Toast.makeText(
+            context,
+            internalFeedback,
+            Toast.LENGTH_SHORT
+        ).show()
+        sendSms(context, userFeedback, phoneNumber)
+    }
+
 
     private fun sendSms(context: Context, message: String, phoneNumber: String) {
         val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
