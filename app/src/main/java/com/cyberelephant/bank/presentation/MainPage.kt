@@ -12,8 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavHostController
+import com.cyberelephant.bank.R
 import com.cyberelephant.bank.presentation.theme.verticalMargin
 import com.cyberelephant.bank.presentation.theme.xxxLargeMargin
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -49,28 +51,28 @@ fun MainPage(navController: NavHostController, modifier: Modifier) {
             modifier = Modifier.padding(vertical = verticalMargin), onClick = {
                 navController.navigate(CyberElephantRoutes.BANK_ACCOUNTS.name)
             }) {
-            Text(text = "Voir les données actuelles")
+            Text(text = stringResource(R.string.home_current_label))
         }
 
         Button(
             modifier = Modifier.padding(vertical = verticalMargin), onClick = {
                 Toast.makeText(localContext, "TODO", Toast.LENGTH_SHORT).show()
             }) {
-            Text(text = "Export (CSV)")
+            Text(text = stringResource(R.string.home_export_label))
         }
 
         Button(
             modifier = Modifier.padding(vertical = verticalMargin), onClick = {
                 Toast.makeText(localContext, "TODO", Toast.LENGTH_SHORT).show()
             }) {
-            Text(text = "Import (CSV)")
+            Text(text = stringResource(R.string.home_import_label))
         }
 
         Button(
             modifier = Modifier.padding(vertical = verticalMargin), onClick = {
                 Toast.makeText(localContext, "TODO", Toast.LENGTH_SHORT).show()
             }) {
-            Text(text = "Help")
+            Text(text = stringResource(R.string.home_help_label))
         }
     }
 
@@ -84,7 +86,7 @@ private fun VerifyPermissionPart(permissionsState: MultiplePermissionsState) {
         Text(
             modifier = Modifier.padding(vertical = verticalMargin),
             textAlign = TextAlign.Center,
-            text = "N'oubliez pas de laisser tourner l'app pour que tous les SMS reçus soient bien pris en compte :)"
+            text = stringResource(R.string.home_permission_ok_label)
         )
     } else {
         val refusedPermissions =
@@ -92,14 +94,14 @@ private fun VerifyPermissionPart(permissionsState: MultiplePermissionsState) {
                 .map { it.permission }
         Text(
             modifier = Modifier.padding(vertical = verticalMargin),
-            text = "Toutes les permissions n'ont pas été acceptées (manquantes : $refusedPermissions).",
+            text = stringResource(R.string.home_permission_denied_label, refusedPermissions),
             textAlign = TextAlign.Center,
         )
         Button(modifier = Modifier.padding(vertical = verticalMargin), onClick = {
             permissionsState.launchMultiplePermissionRequest()
         }) {
             Text(
-                text = "Donner les permissions",
+                text = stringResource(R.string.home_give_permission_label),
                 modifier = Modifier.padding(vertical = verticalMargin),
             )
         }

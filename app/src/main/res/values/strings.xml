@@ -44,4 +44,11 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
+    <string name="home_current_label">Voir les données actuelles</string>
+    <string name="home_export_label">Export (CSV)</string>
+    <string name="home_import_label">Import (CSV)</string>
+    <string name="home_help_label">Aide</string>
+    <string name="home_permission_ok_label">N\'oubliez pas de laisser tourner l\'app pour que tous les SMS reçus soient bien pris en compte :)</string>
+    <string name="home_permission_denied_label">Toutes les permissions n\'ont pas été acceptées (manquantes : %1$s).</string>
+    <string name="home_give_permission_label">Donner les permissions</string>
 </resources>
