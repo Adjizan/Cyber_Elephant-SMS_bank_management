@@ -1,11 +1,14 @@
 package com.cyberelephant.bank.core.di
 
 import androidx.room.Room
+import com.cyberelephant.bank.SmsReceiver
 import com.cyberelephant.bank.data.BankAccountDao
 import com.cyberelephant.bank.data.BankAccountRepository
 import com.cyberelephant.bank.data.BankManagementDatabase
 import com.cyberelephant.bank.domain.repository.BankAccountRepositoryImpl
+import com.cyberelephant.bank.domain.use_case.AddUserUseCase
 import com.cyberelephant.bank.domain.use_case.LoadAllBankAccountsUseCase
+import com.cyberelephant.bank.domain.use_case.VerifyCommandUseCase
 import com.cyberelephant.bank.presentation.accounts.BankAccountPageViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -19,8 +22,17 @@ val cyberElephantModule = module {
             "cyber_elephant_bank_management"
         ).build()
     }
+
     single<BankAccountDao> { get<BankManagementDatabase>().getBankAccountDao() }
+
     single<BankAccountRepository> { BankAccountRepositoryImpl(get()) }
+
     single<LoadAllBankAccountsUseCase> { LoadAllBankAccountsUseCase(get()) }
+    single<VerifyCommandUseCase> { VerifyCommandUseCase() }
+    single<AddUserUseCase> { AddUserUseCase(get()) }
+
+    single<SmsReceiver> {
+        SmsReceiver()
+    }
     viewModel<BankAccountPageViewModel> { BankAccountPageViewModel(get()) }
 }

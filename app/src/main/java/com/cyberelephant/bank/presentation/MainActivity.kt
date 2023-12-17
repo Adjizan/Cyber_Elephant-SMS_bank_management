@@ -12,8 +12,11 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
 import com.cyberelephant.bank.SmsReceiver
 import com.cyberelephant.bank.presentation.theme.BankManagementTheme
+import org.koin.android.ext.android.inject
 
 class MainActivity : AppCompatActivity() {
+
+    private val smsReceiver: SmsReceiver by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         ContextCompat.registerReceiver(
             this,
-            SmsReceiver(),
+            smsReceiver,
             IntentFilter("android.provider.Telephony.SMS_RECEIVED"),
             ContextCompat.RECEIVER_EXPORTED
         )

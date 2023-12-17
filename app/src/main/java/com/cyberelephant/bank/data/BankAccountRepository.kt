@@ -1,5 +1,6 @@
 package com.cyberelephant.bank.data
 
 interface BankAccountRepository {
-    fun allAccounts(): List<BankAccountEntity>
+    suspend fun allAccounts(): List<BankAccountEntity>
+    suspend fun associatePhoneNumber(bankAccount: String, phoneNumber: String)
 }

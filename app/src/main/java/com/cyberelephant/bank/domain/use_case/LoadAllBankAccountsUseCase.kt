@@ -6,7 +6,7 @@ import com.cyberelephant.bank.presentation.accounts.UiBankAccount
 
 class LoadAllBankAccountsUseCase(private val bankAccountRepository: BankAccountRepository) {
 
-    fun call(): List<UiBankAccount> {
+    suspend fun call(): List<UiBankAccount> {
         return bankAccountRepository.allAccounts().toUi()
     }
 

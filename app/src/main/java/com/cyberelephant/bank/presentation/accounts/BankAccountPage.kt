@@ -23,7 +23,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.cyberelephant.bank.R
 import com.cyberelephant.bank.presentation.theme.BankManagementTheme
@@ -64,7 +63,7 @@ private fun BankAccountsList(
     BankManagementTheme {
         Box(Modifier.background(md_theme_dark_background)) {
             LazyColumn() {
-                items(count = bankAccounts.count(), key = { bankAccounts[it].pseudo }) {
+                items(count = bankAccounts.count(), key = { bankAccounts[it].accountNumber }) {
                     BankAccountRow(bankAccounts[it])
                 }
             }
@@ -92,8 +91,6 @@ fun BankAccountRow(uiBankAccount: UiBankAccount) {
                 .padding(xxLargeMargin),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(text = uiBankAccount.pseudo)
-
             val balance = uiBankAccount.balance
             val balanceColor = when {
                 balance > 0 -> colorResource(id = R.color.positive_balance)
@@ -101,6 +98,10 @@ fun BankAccountRow(uiBankAccount: UiBankAccount) {
                     id = R.color.negative_balance
                 )
             }
+
+            Text(text = uiBankAccount.accountNumber)
+            uiBankAccount.phoneNumber?.let { Text(text = it) }
+            uiBankAccount.name?.let { Text(text = it) }
             Text(text = "$balance", color = balanceColor)
         }
     }
@@ -111,7 +112,17 @@ class UiBankAccountPreviewProvider : PreviewParameterProvider<List<UiBankAccount
     override val values: Sequence<List<UiBankAccount>>
         get() = sequenceOf((0..10).map {
             UiBankAccount(
-                "Pseudo $it",
+                "$it",
+                if (it % 2 == 0) {
+                    "+336123456789$it"
+                } else {
+                    null
+                },
+                if (it % 3 == 0) {
+                    "Pseudo $it"
+                } else {
+                    null
+                },
                 (-5000..5000).random().toDouble()
             )
         }.toList())
@@ -119,4 +130,9 @@ class UiBankAccountPreviewProvider : PreviewParameterProvider<List<UiBankAccount
 }
 
 
-data class UiBankAccount(val pseudo: String, val balance: Double)
+data class UiBankAccount(
+    val accountNumber: String,
+    val phoneNumber: String?,
+    val name: String?,
+    val balance: Double
+)
