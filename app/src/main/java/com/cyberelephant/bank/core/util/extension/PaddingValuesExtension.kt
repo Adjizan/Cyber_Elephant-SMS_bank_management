@@ -1,4 +1,4 @@
-package com.cyberelephant.bank.core.util
+package com.cyberelephant.bank.core.util.extension
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable

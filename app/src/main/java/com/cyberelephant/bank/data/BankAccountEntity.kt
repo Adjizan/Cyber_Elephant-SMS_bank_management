@@ -8,5 +8,5 @@ import androidx.room.PrimaryKey
 data class BankAccountEntity(
     @PrimaryKey val id: Int,
     @ColumnInfo val name: String,
-    @ColumnInfo(name = "current_balance") val currentBalance: Float,
+    @ColumnInfo(name = "current_balance") val currentBalance: Double,
 )
