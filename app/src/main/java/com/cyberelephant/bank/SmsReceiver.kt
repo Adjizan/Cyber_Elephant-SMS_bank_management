@@ -3,6 +3,8 @@ package com.cyberelephant.bank
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
+import android.telephony.SmsManager
 import android.telephony.SmsMessage
 import android.widget.Toast
 import com.cyberelephant.bank.core.util.exception.BankAccountAlreadyLinked
@@ -26,7 +28,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
     @Suppress("DEPRECATION")
     override fun onReceive(context: Context, intent: Intent) {
 
-        if (intent.action != "android.provider.Telephony.SMS_RECEIVED") {
+        if (intent.action != "android.provider.Telephony.SMS_RECEIVED" || intent.component?.className == this.javaClass.name) {
             return
         }
 
@@ -38,7 +40,10 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
 
             for (i in pdus.indices) {
                 message.append(
-                    SmsMessage.createFromPdu(pdus[i]).messageBody
+                    SmsMessage.createFromPdu(
+                        pdus[i],
+                        extras.getString("format") ?: "3gpp"
+                    ).messageBody
                 )
             }
             verifyCommandUseCase.call(message.toString())?.let { command ->
@@ -66,38 +71,74 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
         phoneNumber: String
     ) {
         lateinit var feedback: String
+        lateinit var feedbackForUser: String
         goAsync(callback = {
             Toast.makeText(
-                context, feedback, Toast.LENGTH_SHORT
+                context,
+                feedback,
+                Toast.LENGTH_SHORT
             ).show()
+            sendSms(context, feedbackForUser, phoneNumber)
         }) {
             val bankAccount = command.verify(message.toString())!!.groups[1]!!.value
-            feedback = try {
+            try {
 
                 addUserUseCase.call(
                     bankAccount, phoneNumber
                 )
-                context.getString(
-                    R.string.link_phone_and_account_success, bankAccount, phoneNumber
+                feedback = context.getString(
+                    R.string.link_phone_and_account_internal_success, bankAccount, phoneNumber
                 )
+                feedbackForUser = context.getString(R.string.link_phone_and_account_user_success)
 
             } catch (e: Exception) {
                 when (e) {
-                    is BankAccountAlreadyLinked -> context.getString(
-                        R.string.link_phone_and_account_already_linked,
-                        bankAccount,
-                        e.otherPhoneNumber
-                    )
+                    is BankAccountAlreadyLinked -> {
+                        feedback = context.getString(
+                            R.string.link_phone_and_account_internal_already_linked,
+                            bankAccount,
+                            e.otherPhoneNumber
+                        )
+                        feedbackForUser =
+                            context.getString(R.string.link_phone_and_account_user_already_linked)
+                    }
 
-                    is BankAccountUnknown -> context.getString(
-                        R.string.link_phone_and_account_unknown, bankAccount
-                    )
+                    is BankAccountUnknown -> {
+                        feedback = context.getString(
+                            R.string.link_phone_and_account_internal_unknown, bankAccount
+                        )
+                        feedbackForUser =
+                            context.getString(R.string.link_phone_and_account_user_unknown)
+                    }
 
-                    else -> context.getString(
-                        R.string.link_phone_and_account_no_idea, bankAccount, phoneNumber
-                    )
+                    else -> {
+                        feedback = context.getString(
+                            R.string.link_phone_and_account_internal_no_idea,
+                            bankAccount,
+                            phoneNumber
+                        )
+                        feedbackForUser =
+                            context.getString(R.string.link_phone_and_account_user_no_idea)
+                    }
                 }
             }
         }
     }
+
+    private fun sendSms(context: Context, message: String, phoneNumber: String) {
+        val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            context.getSystemService<SmsManager>(SmsManager::class.java)
+        } else {
+            SmsManager.getDefault()
+        }
+        smsManager?.sendTextMessage(phoneNumber, null, message, null, null) ?: run {
+            Toast.makeText(
+                context,
+                "Je n'ai pas réussi à récupérer le SMS Manager",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+
 }

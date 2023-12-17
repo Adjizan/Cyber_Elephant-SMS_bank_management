@@ -19,7 +19,7 @@ fun BroadcastReceiver.goAsync(
             block()
         } finally {
             pendingResult.finish()
+            launch(Dispatchers.Main) { callback?.invoke() }
         }
-        launch(Dispatchers.Main) { callback?.invoke() }
     }
 }
