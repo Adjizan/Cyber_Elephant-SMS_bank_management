@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
 import com.cyberelephant.bank.SmsReceiver
-import com.cyberelephant.bank.presentation.theme.BankManagementTestTheme
+import com.cyberelephant.bank.presentation.theme.BankManagementTheme
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
         setContent {
             val navController = rememberNavController()
 
-            BankManagementTestTheme {
+            BankManagementTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),

@@ -1,6 +1,7 @@
 package com.cyberelephant.bank.presentation.accounts
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +26,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.cyberelephant.bank.R
+import com.cyberelephant.bank.presentation.theme.BankManagementTheme
+import com.cyberelephant.bank.presentation.theme.md_theme_dark_background
 
 @Composable
 fun BankAccountPage(
@@ -56,9 +59,13 @@ fun BankAccountPage(
 private fun bankAccountsList(
     @PreviewParameter(UiBankAccountPreviewProvider::class) bankAccounts: List<UiBankAccount>
 ) {
-    LazyColumn() {
-        items(count = bankAccounts.count(), key = { bankAccounts[it].pseudo }) {
-            BankAccountRow(bankAccounts[it])
+    BankManagementTheme {
+        Box(Modifier.background(md_theme_dark_background)) {
+            LazyColumn() {
+                items(count = bankAccounts.count(), key = { bankAccounts[it].pseudo }) {
+                    BankAccountRow(bankAccounts[it])
+                }
+            }
         }
     }
 }
