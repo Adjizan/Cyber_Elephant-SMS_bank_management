@@ -28,6 +28,8 @@ import androidx.navigation.NavHostController
 import com.cyberelephant.bank.R
 import com.cyberelephant.bank.presentation.theme.BankManagementTheme
 import com.cyberelephant.bank.presentation.theme.md_theme_dark_background
+import com.cyberelephant.bank.presentation.theme.xSmallMargin
+import com.cyberelephant.bank.presentation.theme.xxLargeMargin
 
 @Composable
 fun BankAccountPage(
@@ -41,7 +43,7 @@ fun BankAccountPage(
     when (uiState) {
         is BankAccountLoaded ->
             Box(modifier = modifier) {
-                bankAccountsList((uiState as BankAccountLoaded).bankAccounts)
+                BankAccountsList((uiState as BankAccountLoaded).bankAccounts)
             }
 
         is BankAccountLoading -> Box(
@@ -56,7 +58,7 @@ fun BankAccountPage(
 
 @Preview
 @Composable
-private fun bankAccountsList(
+private fun BankAccountsList(
     @PreviewParameter(UiBankAccountPreviewProvider::class) bankAccounts: List<UiBankAccount>
 ) {
     BankManagementTheme {
@@ -77,7 +79,7 @@ fun BankAccountRow(uiBankAccount: UiBankAccount) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp)
+            .padding(xSmallMargin)
             .clickable {
                 Toast
                     .makeText(current, "$uiBankAccount touched", Toast.LENGTH_SHORT)
@@ -87,7 +89,7 @@ fun BankAccountRow(uiBankAccount: UiBankAccount) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp),
+                .padding(xxLargeMargin),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(text = uiBankAccount.pseudo)
