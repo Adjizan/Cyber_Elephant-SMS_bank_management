@@ -19,6 +19,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.cyberelephant.bank.R
 import com.cyberelephant.bank.presentation.accounts.BankAccountPage
+import com.cyberelephant.bank.presentation.accounts.BankAccountPageViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,7 +51,8 @@ fun CyberElephantNavHost() {
                 appBarTitle.intValue = R.string.bank_account_title
                 BankAccountPage(
                     modifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
-                    navController = navController
+                    navController = navController,
+                    viewModel = koinViewModel<BankAccountPageViewModel>()
                 )
             }
         }

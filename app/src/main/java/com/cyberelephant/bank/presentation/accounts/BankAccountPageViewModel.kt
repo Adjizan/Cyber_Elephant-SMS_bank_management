@@ -11,12 +11,15 @@ import kotlinx.coroutines.launch
 
 class BankAccountPageViewModel(private val loadAllBankAccountsUseCase: LoadAllBankAccountsUseCase) :
     ViewModel() {
+    init {
+        loadAccounts()
+    }
 
     private val _uiState: MutableStateFlow<BankAccountPageState> =
         MutableStateFlow(BankAccountLoading())
-    private val uiState: StateFlow<BankAccountPageState> = _uiState
+    val uiState: StateFlow<BankAccountPageState> = _uiState
 
-    fun loadAccounts() {
+    private fun loadAccounts() {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update {
                 BankAccountLoaded(bankAccounts = loadAllBankAccountsUseCase.call())
