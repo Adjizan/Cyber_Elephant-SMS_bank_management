@@ -14,4 +14,7 @@ interface BankAccountDao {
 
     @Query("UPDATE BANK_ACCOUNT SET phoneNumber = :phoneNumber WHERE accountNumber = :bankAccount")
     suspend fun updatePhoneNumber(bankAccount: String, phoneNumber: String)
+
+    @Query("SELECT current_balance FROM BANK_ACCOUNT WHERE phoneNumber = :phoneNumber")
+    suspend fun consultBalanceFor(phoneNumber: String): Double?
 }

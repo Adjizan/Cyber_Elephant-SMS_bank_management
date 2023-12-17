@@ -16,6 +16,7 @@ import com.cyberelephant.bank.data.HelpCommand
 import com.cyberelephant.bank.data.NewUserCommand
 import com.cyberelephant.bank.data.TransferCommand
 import com.cyberelephant.bank.domain.use_case.AddUserUseCase
+import com.cyberelephant.bank.domain.use_case.ConsultBalanceUseCase
 import com.cyberelephant.bank.domain.use_case.VerifyCommandUseCase
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -24,8 +25,8 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
 
     private val verifyCommandUseCase: VerifyCommandUseCase by inject()
     private val addUserUseCase: AddUserUseCase by inject()
+    private val consultBalanceUseCase: ConsultBalanceUseCase by inject()
 
-    @Suppress("DEPRECATION")
     override fun onReceive(context: Context, intent: Intent) {
 
         if (intent.action != "android.provider.Telephony.SMS_RECEIVED" || intent.component?.className == this.javaClass.name) {
@@ -36,32 +37,66 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
             val message: StringBuilder = StringBuilder()
 
             // pdus is key for SMS in bundle
+            @Suppress("DEPRECATION", "UNCHECKED_CAST")
             val pdus = extras.get("pdus") as Array<ByteArray>
 
+            val pdusFormat = extras.getString("format") ?: "3gpp"
             for (i in pdus.indices) {
                 message.append(
                     SmsMessage.createFromPdu(
                         pdus[i],
-                        extras.getString("format") ?: "3gpp"
+                        pdusFormat
                     ).messageBody
                 )
             }
             verifyCommandUseCase.call(message.toString())?.let { command ->
+                val originatingAddress =
+                    SmsMessage.createFromPdu(pdus[0], pdusFormat).originatingAddress!!
                 when (command) {
-                    ConsultBalanceCommand -> "Consultations"
-                    HelpCommand -> "Aide"
-                    NewUserCommand -> handleNewUser(
+                    ConsultBalanceCommand -> handleConsultBalance(
                         context,
-                        command,
-                        message,
-                        SmsMessage.createFromPdu(pdus[0]).originatingAddress!!
+                        originatingAddress
                     )
+
+                    HelpCommand -> "Aide"
+                    NewUserCommand -> {
+                        handleNewUser(
+                            context,
+                            command,
+                            message,
+                            originatingAddress
+                        )
+                    }
 
                     TransferCommand -> "Transfet"
                 }
             } ?: "NOPE !"
         }
 
+    }
+
+    private fun handleConsultBalance(context: Context, phoneNumber: String) {
+        lateinit var message: String
+        goAsync(callback = {
+            Toast.makeText(
+                context,
+                context.getString(R.string.consult_balance_internal_feedback, phoneNumber),
+                Toast.LENGTH_SHORT
+            ).show()
+            sendSms(context, message, phoneNumber)
+        }) {
+            message = try {
+                context.getString(
+                    R.string.consult_balance_user_success,
+                    consultBalanceUseCase.call(phoneNumber)
+                )
+            } catch (e: Exception) {
+                when (e) {
+                    is BankAccountUnknown -> context.getString(R.string.consult_balance_user_failure)
+                    else -> context.getString(R.string.generic_user_no_idea)
+                }
+            }
+        }
     }
 
     private fun handleNewUser(
@@ -118,7 +153,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                             phoneNumber
                         )
                         feedbackForUser =
-                            context.getString(R.string.link_phone_and_account_user_no_idea)
+                            context.getString(R.string.generic_user_no_idea)
                     }
                 }
             }
@@ -127,8 +162,9 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
 
     private fun sendSms(context: Context, message: String, phoneNumber: String) {
         val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            context.getSystemService<SmsManager>(SmsManager::class.java)
+            context.getSystemService(SmsManager::class.java)
         } else {
+            @Suppress("DEPRECATION")
             SmsManager.getDefault()
         }
         smsManager?.sendTextMessage(phoneNumber, null, message, null, null) ?: run {

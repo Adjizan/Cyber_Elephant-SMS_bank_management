@@ -7,6 +7,7 @@ import com.cyberelephant.bank.data.BankAccountRepository
 import com.cyberelephant.bank.data.BankManagementDatabase
 import com.cyberelephant.bank.domain.repository.BankAccountRepositoryImpl
 import com.cyberelephant.bank.domain.use_case.AddUserUseCase
+import com.cyberelephant.bank.domain.use_case.ConsultBalanceUseCase
 import com.cyberelephant.bank.domain.use_case.LoadAllBankAccountsUseCase
 import com.cyberelephant.bank.domain.use_case.VerifyCommandUseCase
 import com.cyberelephant.bank.presentation.accounts.BankAccountPageViewModel
@@ -30,6 +31,7 @@ val cyberElephantModule = module {
     single<LoadAllBankAccountsUseCase> { LoadAllBankAccountsUseCase(get()) }
     single<VerifyCommandUseCase> { VerifyCommandUseCase() }
     single<AddUserUseCase> { AddUserUseCase(get()) }
+    single<ConsultBalanceUseCase> { ConsultBalanceUseCase(get()) }
 
     single<SmsReceiver> {
         SmsReceiver()

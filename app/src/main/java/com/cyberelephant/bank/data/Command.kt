@@ -18,7 +18,7 @@ data object NewUserCommand : Command() {
 
 data object ConsultBalanceCommand : Command() {
     override val pattern: String
-        get() = "^Solde (\\w+)$"
+        get() = "^Solde$"
 }
 
 data object TransferCommand : Command() {

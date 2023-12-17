@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">CE - SMS bank management</string>
     <string name="bank_account_title">Comptes en banque</string>
+    <string name="generic_user_no_idea">Je ne sais pas ce qu\'il s\'est passé *_*</string>
     <string name="home_current_label">Voir les données actuelles</string>
     <string name="home_export_label">Export (CSV)</string>
     <string name="home_import_label">Import (CSV)</string>
@@ -15,5 +16,7 @@
     <string name="link_phone_and_account_user_success">Merci pour votre inscription !</string>
     <string name="link_phone_and_account_user_already_linked">Opération refusée, numéro de compte déjà attribuée</string>
     <string name="link_phone_and_account_user_unknown">Opération refusée, numéro de compte inconnu</string>
-    <string name="link_phone_and_account_user_no_idea">Je ne sais pas ce qu\'il s\'est passé *_*</string>
+    <string name="consult_balance_internal_feedback">L\'utilisateur %1$s vient de consulter son solde</string>
+    <string name="consult_balance_user_success">Bonjour !\nLe solde de votre compte est actuellement de %1$.2f crédit(s)</string>
+    <string name="consult_balance_user_failure">Opération refusée. Utilisateur.trice inconnu.e</string>
 </resources>

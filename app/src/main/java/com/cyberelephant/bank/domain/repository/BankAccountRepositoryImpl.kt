@@ -22,4 +22,9 @@ class BankAccountRepositoryImpl(private val bankAccountDao: BankAccountDao) :
             throw BankAccountUnknown()
         }
     }
+
+    override suspend fun consultBalanceFor(phoneNumber: String): Double =
+        bankAccountDao.consultBalanceFor(phoneNumber)
+            ?.let { return it }
+            ?: run { throw BankAccountUnknown() }
 }
