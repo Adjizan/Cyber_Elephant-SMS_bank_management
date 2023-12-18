@@ -9,6 +9,7 @@ import com.cyberelephant.bank.domain.repository.BankAccountRepositoryImpl
 import com.cyberelephant.bank.domain.use_case.AddUserUseCase
 import com.cyberelephant.bank.domain.use_case.ConsultBalanceUseCase
 import com.cyberelephant.bank.domain.use_case.LoadAllBankAccountsUseCase
+import com.cyberelephant.bank.domain.use_case.TransferUseCase
 import com.cyberelephant.bank.domain.use_case.VerifyCommandUseCase
 import com.cyberelephant.bank.presentation.accounts.BankAccountPageViewModel
 import org.koin.android.ext.koin.androidContext
@@ -32,6 +33,7 @@ val cyberElephantModule = module {
     single<VerifyCommandUseCase> { VerifyCommandUseCase() }
     single<AddUserUseCase> { AddUserUseCase(get()) }
     single<ConsultBalanceUseCase> { ConsultBalanceUseCase(get()) }
+    single<TransferUseCase> { TransferUseCase(get()) }
 
     single<SmsReceiver> {
         SmsReceiver()

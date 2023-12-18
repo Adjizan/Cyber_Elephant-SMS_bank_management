@@ -9,14 +9,17 @@
     <string name="home_permission_ok_label">N\'oubliez pas de laisser tourner l\'app pour que tous les SMS reçus soient bien pris en compte :)</string>
     <string name="home_permission_denied_label">Toutes les permissions n\'ont pas été acceptées (manquantes : %1$s).</string>
     <string name="home_give_permission_label">Donner les permissions</string>
+    <string name="sms_operation_unknown_user">Opération refusée.\nUtilisateur.trice inconnu.e</string>
     <string name="link_phone_and_account_internal_success">Inscription réalisée entre le compte %1$s et le numéro de téléphone %2$s</string>
     <string name="link_phone_and_account_internal_already_linked">Le compte %1$s est déjà lié à %2$s</string>
     <string name="link_phone_and_account_internal_unknown">Le compte %1$s est inconnu</string>
     <string name="link_phone_and_account_internal_no_idea">Je ne sais pas ce qu\'il se passe, mais la tentative de liaison entre %1$s et %2$s a foiré</string>
-    <string name="link_phone_and_account_user_success">Merci pour votre inscription !</string>
-    <string name="link_phone_and_account_user_already_linked">Opération refusée, numéro de compte déjà attribuée</string>
-    <string name="link_phone_and_account_user_unknown">Opération refusée, numéro de compte inconnu</string>
+    <string name="link_phone_and_account_user_success">Merci pour votre inscription [NAME]!</string>
+    <string name="link_phone_and_account_user_already_linked">Opération refusée\n. Numéro de compte déjà attribuée</string>
+    <string name="link_phone_and_account_user_unknown">Opération refusée.\nNuméro de compte inconnu</string>
     <string name="consult_balance_internal_feedback">L\'utilisateur %1$s vient de consulter son solde</string>
-    <string name="consult_balance_user_success">Bonjour !\nLe solde de votre compte est actuellement de %1$.2f crédit(s)</string>
-    <string name="consult_balance_user_failure">Opération refusée. Utilisateur.trice inconnu.e</string>
+    <string name="consult_balance_user_success">Bonjour [NAME]!\nLe solde de votre compte est actuellement de %1$.2f crédit(s)</string>
+    <string name="transfer_money_internal_insufficient_balance">Opération refusée.\nSolde insuffisant</string>
+    <string name="transfer_money_user_insufficient_balance">Opération refusée.\nSolde insuffisant</string>
+    <string name="transfer_money_user_other_feedback_success">Virement de %1$.2f crédits reçu de la part de %2$s. Nouveau solde : %3$.2f</string>
 </resources>

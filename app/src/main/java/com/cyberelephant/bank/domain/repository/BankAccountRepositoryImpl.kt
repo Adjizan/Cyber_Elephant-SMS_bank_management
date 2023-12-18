@@ -2,9 +2,12 @@ package com.cyberelephant.bank.domain.repository
 
 import com.cyberelephant.bank.core.util.exception.BankAccountAlreadyLinked
 import com.cyberelephant.bank.core.util.exception.BankAccountUnknown
+import com.cyberelephant.bank.core.util.exception.InsufficientBalance
+import com.cyberelephant.bank.core.util.exception.PhoneNumberUnknown
 import com.cyberelephant.bank.data.BankAccountDao
 import com.cyberelephant.bank.data.BankAccountEntity
 import com.cyberelephant.bank.data.BankAccountRepository
+import com.cyberelephant.bank.data.TransferSuccessful
 
 class BankAccountRepositoryImpl(private val bankAccountDao: BankAccountDao) :
     BankAccountRepository {
@@ -14,17 +17,35 @@ class BankAccountRepositoryImpl(private val bankAccountDao: BankAccountDao) :
         val entity = bankAccountDao.searchAccount(bankAccount)
         entity?.let {
             it.phoneNumber?.let { alreadyLinkedPhoneNumber ->
-                throw BankAccountAlreadyLinked(alreadyLinkedPhoneNumber)
+                throw BankAccountAlreadyLinked(bankAccount, alreadyLinkedPhoneNumber)
             } ?: run {
                 bankAccountDao.updatePhoneNumber(bankAccount, phoneNumber)
             }
         } ?: run {
-            throw BankAccountUnknown()
+            throw BankAccountUnknown(bankAccount)
         }
     }
 
     override suspend fun consultBalanceFor(phoneNumber: String): Double =
         bankAccountDao.consultBalanceFor(phoneNumber)
             ?.let { return it }
-            ?: run { throw BankAccountUnknown() }
+            ?: run { throw PhoneNumberUnknown(phoneNumber) }
+
+    override suspend fun transferFunds(
+        fromAccount: String,
+        destinationBankAccount: String,
+        amount: Double
+    ): TransferSuccessful {
+        if (consultBalanceFor(fromAccount) > amount) {
+            bankAccountDao.searchAccount(destinationBankAccount)?.let {
+                bankAccountDao.transferFunds(fromAccount, destinationBankAccount, amount)
+                val name = bankAccountDao.searchAccount(fromAccount)!!.name
+                val newBalance = consultBalanceFor(destinationBankAccount)
+                return TransferSuccessful(name, newBalance)
+            }
+                ?: run { throw BankAccountUnknown(destinationBankAccount) }
+        } else {
+            throw InsufficientBalance()
+        }
+    }
 }
