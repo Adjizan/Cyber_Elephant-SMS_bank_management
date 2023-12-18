@@ -6,7 +6,7 @@ import androidx.room.Query
 @Dao
 interface BankAccountDao {
 
-    @Query("SELECT * FROM BANK_ACCOUNT")
+    @Query("SELECT * FROM BANK_ACCOUNT ORDER BY name, is_organizer ASC")
     suspend fun allAccounts(): List<BankAccountEntity>
 
     @Query("SELECT * FROM BANK_ACCOUNT WHERE accountNumber = :bankAccount")

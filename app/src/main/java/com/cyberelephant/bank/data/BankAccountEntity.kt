@@ -9,6 +9,6 @@ data class BankAccountEntity(
     @PrimaryKey val accountNumber: String,
     @ColumnInfo(name = "phone_number") val phoneNumber: String?,
     @ColumnInfo(name = "name") val name: String?,
-    @ColumnInfo(name = "current_balance") val currentBalance: Double = 0.0,
-    @ColumnInfo(name = "organizer") val organizer: String
+    @ColumnInfo(name = "current_balance", defaultValue = "0.0") val currentBalance: Double = 0.0,
+    @ColumnInfo(name = "is_organizer", defaultValue = "0") val isOrganizer: Boolean = false
 )
