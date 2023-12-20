@@ -7,6 +7,7 @@ interface BankAccountRepository {
     suspend fun transferFunds(
         fromAccount: String,
         destinationBankAccount: String,
-        amount: Double
+        amount: Double,
+        isNPC: Boolean
     ): TransferSuccessful
 }

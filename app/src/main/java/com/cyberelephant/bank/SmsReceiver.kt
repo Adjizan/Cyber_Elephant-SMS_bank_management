@@ -85,7 +85,15 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                         originatingAddress
                     )
 
-                    NPCTransferCommand -> TODO()
+                    NPCTransferCommand -> handleTransfer(
+                        context,
+                        TransferParam.fromNPC(
+                            originatingAddress,
+                            command.verify(message.toString())!!,
+                        ),
+                        originatingAddress
+                    )
+
                 }
             } ?: { TODO() }
         }
@@ -95,7 +103,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
     private fun handleTransfer(
         context: Context,
         transferParam: TransferParam,
-        phoneNumber: String
+        phoneNumber: String,
     ) {
         lateinit var internalFeedback: String
         lateinit var userFeedback: String

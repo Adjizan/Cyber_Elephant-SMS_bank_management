@@ -9,7 +9,8 @@ class TransferUseCase(private val bankAccountRepository: BankAccountRepository) 
         return bankAccountRepository.transferFunds(
             param.fromAccount,
             param.destinationBankAccount,
-            param.amount
+            param.amount,
+            param.isNPC
         )
     }
 
@@ -18,7 +19,8 @@ class TransferUseCase(private val bankAccountRepository: BankAccountRepository) 
 data class TransferParam private constructor(
     val fromAccount: String,
     val destinationBankAccount: String,
-    val amount: Double
+    val amount: Double,
+    val isNPC: Boolean
 ) {
 
     companion object {
@@ -26,7 +28,17 @@ data class TransferParam private constructor(
             return TransferParam(
                 phoneNumber,
                 message.groups[1]!!.value,
-                message.groups[2]!!.value.toDouble()
+                message.groups[2]!!.value.toDouble(),
+                isNPC = false
+            )
+        }
+
+        fun fromNPC(phoneNumber: String, message: MatchResult): TransferParam {
+            return TransferParam(
+                phoneNumber,
+                message.groups[2]!!.value,
+                message.groups[3]!!.value.toDouble(),
+                isNPC = true
             )
         }
     }

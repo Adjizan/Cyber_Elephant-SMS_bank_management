@@ -34,9 +34,12 @@ class BankAccountRepositoryImpl(private val bankAccountDao: BankAccountDao) :
     override suspend fun transferFunds(
         fromAccount: String,
         destinationBankAccount: String,
-        amount: Double
+        amount: Double,
+        isNPC: Boolean
     ): TransferSuccessful {
-        if (consultBalanceFor(fromAccount) > amount) {
+        // this call is useless for NPC but verify the emitter phone number
+        val consultBalanceFor = consultBalanceFor(fromAccount)
+        if (isNPC || consultBalanceFor > amount) {
             bankAccountDao.searchAccount(destinationBankAccount)?.let {
                 bankAccountDao.transferFunds(fromAccount, destinationBankAccount, amount)
                 val name = bankAccountDao.searchAccount(fromAccount)!!.name
