@@ -14,6 +14,7 @@ import com.cyberelephant.bank.core.util.exception.PhoneNumberUnknown
 import com.cyberelephant.bank.core.util.extension.goAsync
 import com.cyberelephant.bank.data.ConsultBalanceCommand
 import com.cyberelephant.bank.data.HelpCommand
+import com.cyberelephant.bank.data.NPCTransferCommand
 import com.cyberelephant.bank.data.NewUserCommand
 import com.cyberelephant.bank.data.TransferCommand
 import com.cyberelephant.bank.data.TransferSuccessful
@@ -83,6 +84,8 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                         ),
                         originatingAddress
                     )
+
+                    NPCTransferCommand -> TODO()
                 }
             } ?: { TODO() }
         }

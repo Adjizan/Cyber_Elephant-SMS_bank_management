@@ -3,6 +3,7 @@ package com.cyberelephant.bank.domain.use_case
 import com.cyberelephant.bank.data.Command
 import com.cyberelephant.bank.data.ConsultBalanceCommand
 import com.cyberelephant.bank.data.HelpCommand
+import com.cyberelephant.bank.data.NPCTransferCommand
 import com.cyberelephant.bank.data.NewUserCommand
 import com.cyberelephant.bank.data.TransferCommand
 
@@ -13,6 +14,7 @@ class VerifyCommandUseCase {
             NewUserCommand,
             ConsultBalanceCommand,
             TransferCommand,
+            NPCTransferCommand,
             HelpCommand
         )
 

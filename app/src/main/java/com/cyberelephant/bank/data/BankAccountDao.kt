@@ -36,7 +36,11 @@ abstract class BankAccountDao {
     abstract suspend fun subtractFunds(bankAccount: String, amount: Double)
 
     @Transaction
-    suspend fun transferFunds(fromAccount: String, destinationBankAccount: String, amount: Double) {
+    open suspend fun transferFunds(
+        fromAccount: String,
+        destinationBankAccount: String,
+        amount: Double
+    ) {
         addFunds(destinationBankAccount, amount)
         subtractFunds(fromAccount, amount)
     }

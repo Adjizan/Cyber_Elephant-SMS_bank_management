@@ -26,6 +26,11 @@ data object TransferCommand : Command() {
         get() = "^Virement (\\w+) (\\d+)$"
 }
 
+data object NPCTransferCommand : Command() {
+    override val pattern: String
+        get() = "^Virement PNJ (\\w)+ (\\w+) (\\d+)$"
+}
+
 data object HelpCommand : Command() {
     override val pattern: String
         get() = "^Manuel$"
