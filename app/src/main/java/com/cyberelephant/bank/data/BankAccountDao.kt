@@ -44,4 +44,7 @@ abstract class BankAccountDao {
         addFunds(destinationBankAccount, amount)
         subtractFunds(fromAccount, amount)
     }
+
+    @Query("SELECT is_organizer FROM bank_account WHERE phone_number = :phoneNumber")
+    abstract fun isOrganizer(phoneNumber: String): Boolean?
 }

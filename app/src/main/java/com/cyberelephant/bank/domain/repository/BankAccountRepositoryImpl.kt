@@ -51,4 +51,9 @@ class BankAccountRepositoryImpl(private val bankAccountDao: BankAccountDao) :
             throw InsufficientBalance()
         }
     }
+
+    override suspend fun isOrganizer(phoneNumber: String): Boolean {
+        return bankAccountDao.isOrganizer(phoneNumber)
+            ?: run { throw PhoneNumberUnknown(phoneNumber) }
+    }
 }

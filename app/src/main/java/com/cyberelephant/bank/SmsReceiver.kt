@@ -21,6 +21,7 @@ import com.cyberelephant.bank.data.TransferSuccessful
 import com.cyberelephant.bank.domain.use_case.AddUserParam
 import com.cyberelephant.bank.domain.use_case.AddUserUseCase
 import com.cyberelephant.bank.domain.use_case.ConsultBalanceUseCase
+import com.cyberelephant.bank.domain.use_case.RequireHelpUseCase
 import com.cyberelephant.bank.domain.use_case.TransferParam
 import com.cyberelephant.bank.domain.use_case.TransferUseCase
 import com.cyberelephant.bank.domain.use_case.VerifyCommandUseCase
@@ -33,6 +34,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
     private val addUserUseCase: AddUserUseCase by inject()
     private val consultBalanceUseCase: ConsultBalanceUseCase by inject()
     private val transferUseCase: TransferUseCase by inject()
+    private val requireHelpUseCase: RequireHelpUseCase by inject()
 
     override fun onReceive(context: Context, intent: Intent) {
 
@@ -56,6 +58,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                     ).messageBody
                 )
             }
+
             verifyCommandUseCase.call(message.toString())?.let { command ->
                 val originatingAddress =
                     SmsMessage.createFromPdu(pdus[0], pdusFormat).originatingAddress!!
@@ -65,7 +68,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                         originatingAddress
                     )
 
-                    HelpCommand -> TODO()
+                    HelpCommand -> handleHelp(context, originatingAddress)
                     NewUserCommand -> {
                         handleNewUser(
                             context,
@@ -96,6 +99,33 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
 
                 }
             } ?: { TODO() }
+        }
+
+    }
+
+    private fun handleHelp(context: Context, phoneNumber: String) {
+        lateinit var internalFeedback: String
+        lateinit var userFeedback: String
+        goAsync(callback = {
+            operationCallback(
+                context = context,
+                internalFeedback = internalFeedback,
+                userFeedback = userFeedback,
+                phoneNumber = phoneNumber
+            )
+        }) {
+            try {
+                internalFeedback =
+                    context.getString(R.string.consult_help_internal_feedback, phoneNumber)
+                userFeedback = context.getString(
+                    R.string.consult_help_user_success,
+                    requireHelpUseCase.call(phoneNumber).joinToString { "- $it\n" }
+                )
+            } catch (e: Exception) {
+                val feedbacks = handleException(context, e)
+                internalFeedback = feedbacks.first
+                userFeedback = feedbacks.second
+            }
         }
 
     }

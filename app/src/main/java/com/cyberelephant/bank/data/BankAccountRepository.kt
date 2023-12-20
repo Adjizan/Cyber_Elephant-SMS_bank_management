@@ -10,4 +10,6 @@ interface BankAccountRepository {
         amount: Double,
         isNPC: Boolean
     ): TransferSuccessful
+
+    suspend fun isOrganizer(phoneNumber: String): Boolean
 }

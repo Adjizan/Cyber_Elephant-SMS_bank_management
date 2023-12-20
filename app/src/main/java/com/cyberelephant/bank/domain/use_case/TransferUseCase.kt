@@ -28,7 +28,7 @@ data class TransferParam private constructor(
             return TransferParam(
                 phoneNumber,
                 message.groups[1]!!.value,
-                message.groups[2]!!.value.toDouble(),
+                message.groups[2]!!.value.replace(",", ".").toDouble(),
                 isNPC = false
             )
         }
@@ -37,7 +37,7 @@ data class TransferParam private constructor(
             return TransferParam(
                 phoneNumber,
                 message.groups[2]!!.value,
-                message.groups[3]!!.value.toDouble(),
+                message.groups[3]!!.value.replace(",", ".").toDouble(),
                 isNPC = true
             )
         }
