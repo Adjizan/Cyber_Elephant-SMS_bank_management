@@ -24,4 +24,8 @@
     <string name="transfer_money_user_other_feedback_success">Virement de %1$.2f crédits reçu de la part de %2$s. Nouveau solde : %3$.2f</string>
     <string name="consult_help_internal_feedback">L\'utilisateur %1$s vient de demander l\'aide.</string>
     <string name="consult_help_user_success">Bonjour !\nVoici la liste des différentes commandes :\n%1$s</string>
+    <string name="bad_command_recognized_internal_feedback">L\'utilisateur %1$s vient de rentrer une commande incorrecte ($2%s)</string>
+    <string name="bad_command_recognized_user_feedback">Opération refusée. La syntaxe de la commande est incorrect. Syntaxe de la commande : \n%1$s</string>
+    <string name="bad_command_not_recognized_internal_feedback">L\'utilisateur %1$s vient de rentrer une commande inconnue ($2%s)</string>
+    <string name="bad_command_not_recognized_user_feedback">Opération refusée. Commande inconnue. Envoyez “Manuel” pour connaitre l’ensemble des commandes</string>
 </resources>

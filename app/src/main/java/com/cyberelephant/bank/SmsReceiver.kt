@@ -20,6 +20,7 @@ import com.cyberelephant.bank.data.TransferCommand
 import com.cyberelephant.bank.data.TransferSuccessful
 import com.cyberelephant.bank.domain.use_case.AddUserParam
 import com.cyberelephant.bank.domain.use_case.AddUserUseCase
+import com.cyberelephant.bank.domain.use_case.BadCommandUseCase
 import com.cyberelephant.bank.domain.use_case.ConsultBalanceUseCase
 import com.cyberelephant.bank.domain.use_case.RequireHelpUseCase
 import com.cyberelephant.bank.domain.use_case.TransferParam
@@ -35,6 +36,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
     private val consultBalanceUseCase: ConsultBalanceUseCase by inject()
     private val transferUseCase: TransferUseCase by inject()
     private val requireHelpUseCase: RequireHelpUseCase by inject()
+    private val badCommandUseCase: BadCommandUseCase by inject()
 
     override fun onReceive(context: Context, intent: Intent) {
 
@@ -59,9 +61,10 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                 )
             }
 
-            verifyCommandUseCase.call(message.toString())?.let { command ->
-                val originatingAddress =
-                    SmsMessage.createFromPdu(pdus[0], pdusFormat).originatingAddress!!
+            val originatingAddress =
+                SmsMessage.createFromPdu(pdus[0], pdusFormat).originatingAddress!!
+            val originalMessage = message.toString()
+            verifyCommandUseCase.call(originalMessage)?.let { command ->
                 when (command) {
                     ConsultBalanceCommand -> handleConsultBalance(
                         context,
@@ -73,7 +76,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                         handleNewUser(
                             context,
                             AddUserParam.from(
-                                command.verify(message.toString())!!,
+                                command.verify(originalMessage)!!,
                                 originatingAddress
                             )
                         )
@@ -83,7 +86,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                         context,
                         TransferParam.from(
                             originatingAddress,
-                            command.verify(message.toString())!!
+                            command.verify(originalMessage)!!
                         ),
                         originatingAddress
                     )
@@ -92,15 +95,56 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                         context,
                         TransferParam.fromNPC(
                             originatingAddress,
-                            command.verify(message.toString())!!,
+                            command.verify(originalMessage)!!,
                         ),
                         originatingAddress
                     )
 
                 }
-            } ?: { TODO() }
+            } ?: {
+                handleNoCommandFound(
+                    context,
+                    originatingAddress,
+                    originalMessage,
+                    badCommandUseCase.call(originalMessage)
+                )
+            }
         }
+    }
 
+    private fun handleNoCommandFound(
+        context: Context,
+        phoneNumber: String,
+        originalMessage: String,
+        badCommandAttemptedHelp: String?
+    ) {
+        lateinit var internalFeedback: String
+        lateinit var userFeedback: String
+        badCommandAttemptedHelp?.let {
+            internalFeedback = context.getString(
+                R.string.bad_command_recognized_internal_feedback,
+                phoneNumber,
+                originalMessage
+            )
+            userFeedback = context.getString(
+                R.string.bad_command_recognized_user_feedback,
+                badCommandAttemptedHelp
+            )
+        }
+            ?: run {
+                internalFeedback = context.getString(
+                    R.string.bad_command_not_recognized_internal_feedback,
+                    phoneNumber,
+                    originalMessage
+                )
+                userFeedback = context.getString(R.string.bad_command_not_recognized_user_feedback)
+            }
+        operationCallback(
+            context = context,
+            internalFeedback = internalFeedback,
+            userFeedback = userFeedback,
+            phoneNumber = phoneNumber
+        )
     }
 
     private fun handleHelp(context: Context, phoneNumber: String) {
