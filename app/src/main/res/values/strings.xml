@@ -29,4 +29,13 @@
     <string name="bad_command_not_recognized_internal_feedback">L\'utilisateur %1$s vient de rentrer une commande inconnue ($2%s)</string>
     <string name="bad_command_not_recognized_user_feedback">Opération refusée. Commande inconnue. Envoyez “Manuel” pour connaitre l’ensemble des commandes</string>
     <string name="account_cell_no_number">Non encore associé à un numéro</string>
+    <string name="add_account_sheet_title">Ajout de compte</string>
+    <string name="add_account_sheet_name_label">Nom</string>
+    <string name="add_account_sheet_account_number_label">N° de compte</string>
+    <string name="add_account_sheet_phone_number_label">N° de téléphone</string>
+    <string name="add_account_sheet_balance_label">Balance</string>
+    <string name="add_account_sheet_is_orga_label">Orga / PNJ</string>
+    <string name="generic_cancel">Annuler</string>
+    <string name="add_account_sheet_validate_button_label">Créer le compte</string>
+    <string name="add_account_sheet_account_number_help">Longueur = %1$s</string>
 </resources>

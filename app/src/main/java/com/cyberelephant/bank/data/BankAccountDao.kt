@@ -1,6 +1,7 @@
 package com.cyberelephant.bank.data
 
 import androidx.room.Dao
+import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 
@@ -43,5 +44,8 @@ abstract class BankAccountDao {
     }
 
     @Query("SELECT is_organizer FROM bank_account WHERE phone_number = :phoneNumber")
-    abstract fun isOrganizer(phoneNumber: String): Boolean?
+    abstract suspend fun isOrganizer(phoneNumber: String): Boolean?
+
+    @Insert
+    abstract suspend fun insert(bankAccountEntity: BankAccountEntity)
 }

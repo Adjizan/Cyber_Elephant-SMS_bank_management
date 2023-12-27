@@ -32,6 +32,24 @@ class BankAccountRepositoryImpl(private val bankAccountDao: BankAccountDao) :
             ?.let { return Pair(it.name, it.currentBalance) }
             ?: run { throw PhoneNumberUnknown(phoneNumber) }
 
+    override suspend fun createBankAccount(
+        accountNumber: String,
+        name: String,
+        balance: Double,
+        phoneNumber: String?,
+        isOrga: Boolean
+    ) {
+        bankAccountDao.insert(
+            BankAccountEntity(
+                accountNumber,
+                phoneNumber,
+                name,
+                balance,
+                isOrga
+            )
+        )
+    }
+
     override suspend fun transferFunds(
         fromAccount: String,
         destinationBankAccount: String,

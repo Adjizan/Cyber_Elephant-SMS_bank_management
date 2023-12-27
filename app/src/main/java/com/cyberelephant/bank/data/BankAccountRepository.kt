@@ -12,4 +12,12 @@ interface BankAccountRepository {
     ): TransferSuccessful
 
     suspend fun isOrganizer(phoneNumber: String): Boolean
+    suspend fun createBankAccount(
+        accountNumber: String,
+        name: String,
+        balance: Double,
+        phoneNumber: String?,
+        isOrga: Boolean
+    )
+
 }

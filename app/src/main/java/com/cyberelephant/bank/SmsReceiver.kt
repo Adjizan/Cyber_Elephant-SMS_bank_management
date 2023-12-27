@@ -19,7 +19,7 @@ import com.cyberelephant.bank.data.NewUserCommand
 import com.cyberelephant.bank.data.TransferCommand
 import com.cyberelephant.bank.data.TransferSuccessful
 import com.cyberelephant.bank.domain.use_case.AddUserParam
-import com.cyberelephant.bank.domain.use_case.AddUserUseCase
+import com.cyberelephant.bank.domain.use_case.AssociatePhoneNumberUseCase
 import com.cyberelephant.bank.domain.use_case.BadCommandUseCase
 import com.cyberelephant.bank.domain.use_case.ConsultBalanceUseCase
 import com.cyberelephant.bank.domain.use_case.RequireHelpUseCase
@@ -32,7 +32,7 @@ import org.koin.core.component.inject
 class SmsReceiver : BroadcastReceiver(), KoinComponent {
 
     private val verifyCommandUseCase: VerifyCommandUseCase by inject()
-    private val addUserUseCase: AddUserUseCase by inject()
+    private val associatePhoneNumberUseCase: AssociatePhoneNumberUseCase by inject()
     private val consultBalanceUseCase: ConsultBalanceUseCase by inject()
     private val transferUseCase: TransferUseCase by inject()
     private val requireHelpUseCase: RequireHelpUseCase by inject()
@@ -255,7 +255,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
         }) {
             try {
 
-                val name = addUserUseCase.call(addUserParam)
+                val name = associatePhoneNumberUseCase.call(addUserParam)
                 internalFeedback = context.getString(
                     R.string.link_phone_and_account_internal_success,
                     addUserParam.bankAccount,

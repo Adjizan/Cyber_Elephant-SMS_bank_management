@@ -6,13 +6,15 @@ import com.cyberelephant.bank.data.BankAccountDao
 import com.cyberelephant.bank.data.BankAccountRepository
 import com.cyberelephant.bank.data.BankManagementDatabase
 import com.cyberelephant.bank.domain.repository.BankAccountRepositoryImpl
-import com.cyberelephant.bank.domain.use_case.AddUserUseCase
+import com.cyberelephant.bank.domain.use_case.AssociatePhoneNumberUseCase
 import com.cyberelephant.bank.domain.use_case.BadCommandUseCase
 import com.cyberelephant.bank.domain.use_case.ConsultBalanceUseCase
+import com.cyberelephant.bank.domain.use_case.CreateBankAccountUseCase
 import com.cyberelephant.bank.domain.use_case.LoadAllBankAccountsUseCase
 import com.cyberelephant.bank.domain.use_case.RequireHelpUseCase
 import com.cyberelephant.bank.domain.use_case.TransferUseCase
 import com.cyberelephant.bank.domain.use_case.VerifyCommandUseCase
+import com.cyberelephant.bank.presentation.accounts.AddBankAccountViewModel
 import com.cyberelephant.bank.presentation.accounts.BankAccountPageViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -34,7 +36,8 @@ val cyberElephantModule = module {
     single<LoadAllBankAccountsUseCase> { LoadAllBankAccountsUseCase(get()) }
     single<VerifyCommandUseCase> { VerifyCommandUseCase() }
     single<BadCommandUseCase> { BadCommandUseCase() }
-    single<AddUserUseCase> { AddUserUseCase(get()) }
+    single<AssociatePhoneNumberUseCase> { AssociatePhoneNumberUseCase(get()) }
+    single<CreateBankAccountUseCase> { CreateBankAccountUseCase(get()) }
     single<ConsultBalanceUseCase> { ConsultBalanceUseCase(get()) }
     single<TransferUseCase> { TransferUseCase(get()) }
     single<RequireHelpUseCase> { RequireHelpUseCase(get()) }
@@ -43,4 +46,5 @@ val cyberElephantModule = module {
         SmsReceiver()
     }
     viewModel<BankAccountPageViewModel> { BankAccountPageViewModel(get()) }
+    viewModel<AddBankAccountViewModel> { AddBankAccountViewModel(get()) }
 }
