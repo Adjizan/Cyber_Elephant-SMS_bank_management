@@ -13,22 +13,23 @@ class BankAccountRepositoryImpl(private val bankAccountDao: BankAccountDao) :
     BankAccountRepository {
     override suspend fun allAccounts(): List<BankAccountEntity> = bankAccountDao.allAccounts()
 
-    override suspend fun associatePhoneNumber(bankAccount: String, phoneNumber: String) {
+    override suspend fun associatePhoneNumber(bankAccount: String, phoneNumber: String): String {
         val entity = bankAccountDao.searchAccount(bankAccount)
         entity?.let {
             it.phoneNumber?.let { alreadyLinkedPhoneNumber ->
                 throw BankAccountAlreadyLinked(bankAccount, alreadyLinkedPhoneNumber)
             } ?: run {
                 bankAccountDao.updatePhoneNumber(bankAccount, phoneNumber)
+                return bankAccountDao.searchAccount(bankAccount)!!.name
             }
         } ?: run {
             throw BankAccountUnknown(bankAccount)
         }
     }
 
-    override suspend fun consultBalanceFor(phoneNumber: String): Double =
-        bankAccountDao.consultBalanceFor(phoneNumber)
-            ?.let { return it }
+    override suspend fun consultBalanceFor(phoneNumber: String): Pair<String, Double> =
+        bankAccountDao.searchAccount(phoneNumber)
+            ?.let { return Pair(it.name, it.currentBalance) }
             ?: run { throw PhoneNumberUnknown(phoneNumber) }
 
     override suspend fun transferFunds(
@@ -39,11 +40,11 @@ class BankAccountRepositoryImpl(private val bankAccountDao: BankAccountDao) :
     ): TransferSuccessful {
         // this call is useless for NPC but verify the emitter phone number
         val consultBalanceFor = consultBalanceFor(fromAccount)
-        if (isNPC || consultBalanceFor > amount) {
+        if (isNPC || consultBalanceFor.second > amount) {
             bankAccountDao.searchAccount(destinationBankAccount)?.let {
                 bankAccountDao.transferFunds(fromAccount, destinationBankAccount, amount)
                 val name = bankAccountDao.searchAccount(fromAccount)!!.name
-                val newBalance = consultBalanceFor(destinationBankAccount)
+                val newBalance = consultBalanceFor(destinationBankAccount).second
                 return TransferSuccessful(name, newBalance)
             }
                 ?: run { throw BankAccountUnknown(destinationBankAccount) }

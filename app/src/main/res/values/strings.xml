@@ -14,11 +14,11 @@
     <string name="link_phone_and_account_internal_already_linked">Le compte %1$s est déjà lié à %2$s</string>
     <string name="link_phone_and_account_internal_unknown">Le compte %1$s est inconnu</string>
     <string name="link_phone_and_account_internal_no_idea">Je ne sais pas ce qu\'il se passe, mais la tentative de liaison entre %1$s et %2$s a foiré</string>
-    <string name="link_phone_and_account_user_success">Merci pour votre inscription [NAME]!</string>
+    <string name="link_phone_and_account_user_success">Merci pour votre inscription %1$s!</string>
     <string name="link_phone_and_account_user_already_linked">Opération refusée\n. Numéro de compte déjà attribuée</string>
     <string name="link_phone_and_account_user_unknown">Opération refusée.\nNuméro de compte inconnu</string>
     <string name="consult_balance_internal_feedback">L\'utilisateur %1$s vient de consulter son solde</string>
-    <string name="consult_balance_user_success">Bonjour [NAME]!\nLe solde de votre compte est actuellement de %1$.2f crédit(s)</string>
+    <string name="consult_balance_user_success">Bonjour %1$s!\nLe solde de votre compte est actuellement de %2$.2f crédit(s)</string>
     <string name="transfer_money_internal_insufficient_balance">Opération refusée.\nSolde insuffisant</string>
     <string name="transfer_money_user_insufficient_balance">Opération refusée.\nSolde insuffisant</string>
     <string name="transfer_money_user_other_feedback_success">Virement de %1$.2f crédits reçu de la part de %2$s. Nouveau solde : %3$.2f</string>
@@ -28,4 +28,5 @@
     <string name="bad_command_recognized_user_feedback">Opération refusée. La syntaxe de la commande est incorrect. Syntaxe de la commande : \n%1$s</string>
     <string name="bad_command_not_recognized_internal_feedback">L\'utilisateur %1$s vient de rentrer une commande inconnue ($2%s)</string>
     <string name="bad_command_not_recognized_user_feedback">Opération refusée. Commande inconnue. Envoyez “Manuel” pour connaitre l’ensemble des commandes</string>
+    <string name="account_cell_no_number">Non encore associé à un numéro</string>
 </resources>

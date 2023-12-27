@@ -16,9 +16,6 @@ abstract class BankAccountDao {
     @Query("UPDATE BANK_ACCOUNT SET phone_number = :phoneNumber WHERE accountNumber = :bankAccount")
     abstract suspend fun updatePhoneNumber(bankAccount: String, phoneNumber: String)
 
-    @Query("SELECT current_balance FROM BANK_ACCOUNT WHERE phone_number = :phoneNumber")
-    abstract suspend fun consultBalanceFor(phoneNumber: String): Double?
-
     @Query(
         """UPDATE bank_account 
                 SET current_balance = current_balance + :amount 

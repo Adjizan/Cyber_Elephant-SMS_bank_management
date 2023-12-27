@@ -224,9 +224,11 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
             try {
                 internalFeedback =
                     context.getString(R.string.consult_balance_internal_feedback, phoneNumber)
+                val nameBalance = consultBalanceUseCase.call(phoneNumber)
                 userFeedback = context.getString(
                     R.string.consult_balance_user_success,
-                    consultBalanceUseCase.call(phoneNumber)
+                    nameBalance.first,
+                    nameBalance.second,
                 )
             } catch (e: Exception) {
                 val feedbacks = handleException(context, e)
@@ -253,13 +255,13 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
         }) {
             try {
 
-                addUserUseCase.call(addUserParam)
+                val name = addUserUseCase.call(addUserParam)
                 internalFeedback = context.getString(
                     R.string.link_phone_and_account_internal_success,
                     addUserParam.bankAccount,
                     addUserParam.phoneNumber
                 )
-                userFeedback = context.getString(R.string.link_phone_and_account_user_success)
+                userFeedback = context.getString(R.string.link_phone_and_account_user_success, name)
 
             } catch (e: Exception) {
                 val feedbacks = handleException(context, e)

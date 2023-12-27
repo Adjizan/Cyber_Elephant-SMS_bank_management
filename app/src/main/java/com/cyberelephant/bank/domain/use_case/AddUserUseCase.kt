@@ -4,8 +4,8 @@ import com.cyberelephant.bank.data.BankAccountRepository
 
 class AddUserUseCase(private val bankAccountRepository: BankAccountRepository) {
 
-    suspend fun call(param: AddUserParam) {
-        bankAccountRepository.associatePhoneNumber(
+    suspend fun call(param: AddUserParam): String {
+        return bankAccountRepository.associatePhoneNumber(
             param.bankAccount,
             param.phoneNumber
         )
