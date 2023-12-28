@@ -53,7 +53,7 @@ data object NPCTransferCommand : Command() {
     override val pattern: String
         get() = "^$instruction (\\w)+ (\\w+) (\\d+)$"
     override val help: String
-        get() = "Transfer des fonds PNJ : Virement PNJ [NOM_DE_PERSONNAGE] [NUMÉRO_DE_COMPTE_DESTINATAIRE] [MONTANT]"
+        get() = "Transfer des fonds PNJ : Virement PNJ [NUMÉRO_DE_COMPTE_PNJ] [NUMÉRO_DE_COMPTE_DESTINATAIRE] [MONTANT]"
     override val forOrganizerOnly: Boolean
         get() = true
 }
