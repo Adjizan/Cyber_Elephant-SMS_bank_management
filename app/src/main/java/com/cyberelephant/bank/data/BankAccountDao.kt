@@ -36,12 +36,12 @@ abstract class BankAccountDao {
 
     @Transaction
     open suspend fun transferFunds(
-        fromAccount: String,
+        originatingBankAccount: String,
         destinationBankAccount: String,
         amount: Double
     ) {
         addFunds(destinationBankAccount, amount)
-        subtractFunds(fromAccount, amount)
+        subtractFunds(originatingBankAccount, amount)
     }
 
     @Query("SELECT is_organizer FROM bank_account WHERE phone_number = :phoneNumber")
@@ -69,5 +69,15 @@ abstract class BankAccountDao {
         balance: Double,
         orga: Boolean
     )
+
+    @Query(
+        """
+        SELECT *
+        FROM BANK_ACCOUNT
+        WHERE
+            phone_number = :phoneNumber
+    """
+    )
+    abstract suspend fun searchAccountByPhone(phoneNumber: String): BankAccountEntity?
 
 }

@@ -5,12 +5,11 @@ import kotlinx.coroutines.flow.Flow
 interface BankAccountRepository {
     fun allAccounts(): Flow<List<BankAccountEntity>>
     suspend fun associatePhoneNumber(bankAccount: String, phoneNumber: String): String
-    suspend fun consultBalanceFor(phoneNumber: String): Pair<String, Double>
-    suspend fun transferFunds(
-        fromAccount: String,
+    suspend fun consultBalanceForPhoneNumber(phoneNumber: String): Pair<String, Double>
+    suspend fun pcTransferFunds(
+        fromPhoneNumber: String,
         destinationBankAccount: String,
-        amount: Double,
-        isNPC: Boolean
+        amount: Double
     ): TransferSuccessful
 
     suspend fun isOrganizer(phoneNumber: String): Boolean
@@ -29,5 +28,11 @@ interface BankAccountRepository {
         phoneNumber: String?,
         isNPC: Boolean
     )
+
+    suspend fun npcTransferFunds(
+        originatingBankAccountNumber: String,
+        destinationBankAccountNumber: String,
+        amount: Double,
+    ): TransferSuccessful
 
 }

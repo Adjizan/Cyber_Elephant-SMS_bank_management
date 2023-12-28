@@ -3,6 +3,7 @@ package com.cyberelephant.bank.domain.repository
 import com.cyberelephant.bank.core.util.exception.BankAccountAlreadyLinked
 import com.cyberelephant.bank.core.util.exception.BankAccountUnknown
 import com.cyberelephant.bank.core.util.exception.InsufficientBalance
+import com.cyberelephant.bank.core.util.exception.NotAnNPCBankAccount
 import com.cyberelephant.bank.core.util.exception.PhoneNumberUnknown
 import com.cyberelephant.bank.data.BankAccountDao
 import com.cyberelephant.bank.data.BankAccountEntity
@@ -15,23 +16,18 @@ class BankAccountRepositoryImpl(private val bankAccountDao: BankAccountDao) :
     override fun allAccounts(): Flow<List<BankAccountEntity>> = bankAccountDao.allAccounts()
 
     override suspend fun associatePhoneNumber(bankAccount: String, phoneNumber: String): String {
-        val entity = bankAccountDao.searchAccount(bankAccount)
-        entity?.let {
-            it.phoneNumber?.let { alreadyLinkedPhoneNumber ->
-                throw BankAccountAlreadyLinked(bankAccount, alreadyLinkedPhoneNumber)
-            } ?: run {
-                bankAccountDao.updatePhoneNumber(bankAccount, phoneNumber)
-                return bankAccountDao.searchAccount(bankAccount)!!.name
-            }
+        searchAccountByNumber(bankAccount).phoneNumber?.let { alreadyLinkedPhoneNumber ->
+            throw BankAccountAlreadyLinked(bankAccount, alreadyLinkedPhoneNumber)
         } ?: run {
-            throw BankAccountUnknown(bankAccount)
+            bankAccountDao.updatePhoneNumber(bankAccount, phoneNumber)
+            return searchAccountByNumber(bankAccount).name
         }
     }
 
-    override suspend fun consultBalanceFor(phoneNumber: String): Pair<String, Double> =
-        bankAccountDao.searchAccount(phoneNumber)
-            ?.let { return Pair(it.name, it.currentBalance) }
-            ?: run { throw PhoneNumberUnknown(phoneNumber) }
+    override suspend fun consultBalanceForPhoneNumber(phoneNumber: String): Pair<String, Double> =
+        bankAccountDao.searchAccountByPhone(phoneNumber)?.let {
+            Pair(it.name, it.currentBalance)
+        } ?: run { throw PhoneNumberUnknown(phoneNumber) }
 
     override suspend fun createBankAccount(
         accountNumber: String,
@@ -60,24 +56,52 @@ class BankAccountRepositoryImpl(private val bankAccountDao: BankAccountDao) :
     ): Unit = bankAccountDao.updateBankAccount(accountNumber, phoneNumber, name, balance, isNPC)
 
 
-    override suspend fun transferFunds(
-        fromAccount: String,
+    override suspend fun pcTransferFunds(
+        fromPhoneNumber: String,
         destinationBankAccount: String,
-        amount: Double,
-        isNPC: Boolean
+        amount: Double
     ): TransferSuccessful {
-        // this call is useless for NPC but verify the emitter phone number
-        val consultBalanceFor = consultBalanceFor(fromAccount)
-        if (isNPC || consultBalanceFor.second > amount) {
-            bankAccountDao.searchAccount(destinationBankAccount)?.let {
-                bankAccountDao.transferFunds(fromAccount, destinationBankAccount, amount)
-                val name = bankAccountDao.searchAccount(fromAccount)!!.name
-                val newBalance = consultBalanceFor(destinationBankAccount).second
-                return TransferSuccessful(name, newBalance)
-            }
-                ?: run { throw BankAccountUnknown(destinationBankAccount) }
+        val bankAccount: BankAccountEntity = searchAccountByPhone(phoneNumber = fromPhoneNumber)
+
+        if (bankAccount.currentBalance > amount) {
+            val destination = searchAccountByNumber(destinationBankAccount)
+            bankAccountDao.transferFunds(
+                bankAccount.accountNumber,
+                destination.accountNumber,
+                amount
+            )
+            return TransferSuccessful(
+                bankAccount.name,
+                searchAccountByNumber(bankAccount.accountNumber).currentBalance,
+                searchAccountByNumber(destination.accountNumber).currentBalance,
+                destination.phoneNumber
+            )
         } else {
             throw InsufficientBalance()
+        }
+    }
+
+    override suspend fun npcTransferFunds(
+        originatingBankAccountNumber: String,
+        destinationBankAccountNumber: String,
+        amount: Double
+    ): TransferSuccessful {
+        val bankAccount: BankAccountEntity = searchAccountByNumber(originatingBankAccountNumber)
+        if (bankAccount.isOrganizer) {
+            bankAccountDao.transferFunds(
+                bankAccount.accountNumber,
+                destinationBankAccountNumber,
+                amount
+            )
+            val destinationBankAccount = searchAccountByNumber(destinationBankAccountNumber)
+            return TransferSuccessful(
+                bankAccount.name,
+                searchAccountByNumber(originatingBankAccountNumber).currentBalance,
+                destinationBankAccount.currentBalance,
+                destinationBankAccount.phoneNumber
+            )
+        } else {
+            throw NotAnNPCBankAccount(originatingBankAccountNumber)
         }
     }
 
@@ -85,4 +109,12 @@ class BankAccountRepositoryImpl(private val bankAccountDao: BankAccountDao) :
         return bankAccountDao.isOrganizer(phoneNumber)
             ?: run { throw PhoneNumberUnknown(phoneNumber) }
     }
+
+    private suspend fun searchAccountByNumber(accountNumber: String): BankAccountEntity =
+        bankAccountDao.searchAccount(accountNumber)
+            ?: run { throw BankAccountUnknown(accountNumber) }
+
+    private suspend fun searchAccountByPhone(phoneNumber: String): BankAccountEntity =
+        bankAccountDao.searchAccountByPhone(phoneNumber)
+            ?: run { throw PhoneNumberUnknown(phoneNumber) }
 }

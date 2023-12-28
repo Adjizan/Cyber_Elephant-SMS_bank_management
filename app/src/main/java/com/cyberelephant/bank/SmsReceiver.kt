@@ -11,6 +11,7 @@ import com.cyberelephant.bank.core.util.debugLog
 import com.cyberelephant.bank.core.util.exception.BankAccountAlreadyLinked
 import com.cyberelephant.bank.core.util.exception.BankAccountUnknown
 import com.cyberelephant.bank.core.util.exception.InsufficientBalance
+import com.cyberelephant.bank.core.util.exception.NotAnNPCBankAccount
 import com.cyberelephant.bank.core.util.exception.PhoneNumberUnknown
 import com.cyberelephant.bank.core.util.extension.goAsync
 import com.cyberelephant.bank.data.ConsultBalanceCommand
@@ -23,9 +24,9 @@ import com.cyberelephant.bank.domain.use_case.AddUserParam
 import com.cyberelephant.bank.domain.use_case.AssociatePhoneNumberUseCase
 import com.cyberelephant.bank.domain.use_case.BadCommandUseCase
 import com.cyberelephant.bank.domain.use_case.ConsultBalanceUseCase
+import com.cyberelephant.bank.domain.use_case.FundsTransferParam
+import com.cyberelephant.bank.domain.use_case.FundsTransferUseCase
 import com.cyberelephant.bank.domain.use_case.RequireHelpUseCase
-import com.cyberelephant.bank.domain.use_case.TransferParam
-import com.cyberelephant.bank.domain.use_case.TransferUseCase
 import com.cyberelephant.bank.domain.use_case.VerifyCommandUseCase
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -35,7 +36,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
     private val verifyCommandUseCase: VerifyCommandUseCase by inject()
     private val associatePhoneNumberUseCase: AssociatePhoneNumberUseCase by inject()
     private val consultBalanceUseCase: ConsultBalanceUseCase by inject()
-    private val transferUseCase: TransferUseCase by inject()
+    private val fundsTransferUseCase: FundsTransferUseCase by inject()
     private val requireHelpUseCase: RequireHelpUseCase by inject()
     private val badCommandUseCase: BadCommandUseCase by inject()
 
@@ -73,6 +74,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                     )
 
                     HelpCommand -> handleHelp(context, originatingAddress)
+
                     NewUserCommand -> {
                         handleNewUser(
                             context,
@@ -83,19 +85,18 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                         )
                     }
 
-                    TransferCommand -> handleTransfer(
+                    TransferCommand -> handleFundsTransfer(
                         context,
-                        TransferParam.from(
+                        FundsTransferParam.fromPC(
                             originatingAddress,
                             command.verify(originalMessage)!!
                         ),
                         originatingAddress
                     )
 
-                    NPCTransferCommand -> handleTransfer(
+                    NPCTransferCommand -> handleFundsTransfer(
                         context,
-                        TransferParam.fromNPC(
-                            originatingAddress,
+                        FundsTransferParam.fromNPC(
                             command.verify(originalMessage)!!,
                         ),
                         originatingAddress
@@ -131,15 +132,14 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                 R.string.bad_command_recognized_user_feedback,
                 badCommandAttemptedHelp
             )
+        } ?: run {
+            internalFeedback = context.getString(
+                R.string.bad_command_not_recognized_internal_feedback,
+                phoneNumber,
+                originalMessage
+            )
+            userFeedback = context.getString(R.string.bad_command_not_recognized_user_feedback)
         }
-            ?: run {
-                internalFeedback = context.getString(
-                    R.string.bad_command_not_recognized_internal_feedback,
-                    phoneNumber,
-                    originalMessage
-                )
-                userFeedback = context.getString(R.string.bad_command_not_recognized_user_feedback)
-            }
         operationCallback(
             context = context,
             internalFeedback = internalFeedback,
@@ -170,45 +170,72 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                 debugLog(exception = e)
                 val feedbacks = handleException(context, e)
                 internalFeedback = feedbacks.first
-                userFeedback = feedbacks.second
+                userFeedback = feedbacks.second!!
             }
         }
 
     }
 
-    private fun handleTransfer(
+    private fun handleFundsTransfer(
         context: Context,
-        transferParam: TransferParam,
-        phoneNumber: String,
+        fundsTransferParam: FundsTransferParam,
+        originatingPhoneNumber: String,
     ) {
         lateinit var internalFeedback: String
-        lateinit var userFeedback: String
+        var userFeedback: String? = null
         lateinit var toOther: TransferSuccessful
         goAsync(callback = {
             operationCallback(
                 context = context,
                 internalFeedback = internalFeedback,
                 userFeedback = userFeedback,
-                phoneNumber = phoneNumber
+                phoneNumber = originatingPhoneNumber
             )
-            sendSms(
-                context,
-                context.getString(
-                    R.string.transfer_money_user_other_feedback_success,
-                    transferParam.amount,
-                    toOther.fromName,
-                    toOther.newBalance
-                ),
-                transferParam.destinationBankAccount
-            )
+
+            toOther.destinationPhoneNumber?.let {
+                sendSms(
+                    context,
+                    context.getString(
+                        R.string.transfer_money_other_feedback_success,
+                        fundsTransferParam.amount,
+                        toOther.fromName,
+                        toOther.newBalanceDestinationAccount
+                    ),
+                    it
+                )
+            } ?: run {
+                operationCallback(
+                    context = context,
+                    internalFeedback = context.getString(
+                        R.string.transfer_money_internal_feedback_to_unlinked_account,
+                        originatingPhoneNumber,
+                        fundsTransferParam.destinationBankAccount
+                    ),
+                )
+            }
+
         }) {
             try {
-                toOther = transferUseCase.call(transferParam)
+                toOther = fundsTransferUseCase.call(fundsTransferParam)
+                if (fundsTransferParam.originatingPhoneNumber != null) {
+                    userFeedback =
+                        context.getString(
+                            R.string.transfer_money_user_feedback_success,
+                            toOther.newBalanceOriginatingAccount
+                        )
+                }
+                internalFeedback =
+                    context.getString(
+                        R.string.transfer_money_internal_feedback_success,
+                        fundsTransferParam.amount,
+                        fundsTransferParam.originatingPhoneNumber
+                            ?: fundsTransferParam.originatingBankAccount,
+                        fundsTransferParam.destinationBankAccount
+                    )
             } catch (e: Exception) {
                 debugLog(exception = e)
                 val feedbacks = handleException(context, e)
                 internalFeedback = feedbacks.first
-                userFeedback = feedbacks.second
             }
         }
     }
@@ -226,7 +253,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
         }) {
             try {
                 internalFeedback =
-                    context.getString(R.string.consult_balance_internal_feedback, phoneNumber)
+                    context.getString(R.string.consult_balance_internal_success, phoneNumber)
                 val nameBalance = consultBalanceUseCase.call(phoneNumber)
                 userFeedback = context.getString(
                     R.string.consult_balance_user_success,
@@ -237,7 +264,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                 debugLog(exception = e)
                 val feedbacks = handleException(context, e)
                 internalFeedback = feedbacks.first
-                userFeedback = feedbacks.second
+                userFeedback = feedbacks.second!!
             }
         }
     }
@@ -271,7 +298,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                 debugLog(exception = e)
                 val feedbacks = handleException(context, e)
                 internalFeedback = feedbacks.first
-                userFeedback = feedbacks.second
+                userFeedback = feedbacks.second!!
             }
         }
     }
@@ -279,15 +306,18 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
     private fun operationCallback(
         context: Context,
         internalFeedback: String,
-        userFeedback: String,
-        phoneNumber: String
+        userFeedback: String? = null,
+        phoneNumber: String? = null
     ) {
         Toast.makeText(
             context,
             internalFeedback,
             Toast.LENGTH_SHORT
         ).show()
-        sendSms(context, userFeedback, phoneNumber)
+
+        if (userFeedback != null && phoneNumber != null) {
+            sendSms(context, userFeedback, phoneNumber)
+        }
     }
 
     private fun sendSms(context: Context, message: String, phoneNumber: String) {
@@ -313,9 +343,9 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
     private fun handleException(
         context: Context,
         e: Exception,
-    ): Pair<String, String> {
-        lateinit var internalFeedback: String
-        lateinit var userFeedback: String
+    ): Pair<String, String?> {
+        val internalFeedback: String
+        val userFeedback: String?
         when (e) {
             is BankAccountAlreadyLinked -> {
                 internalFeedback = context.getString(
@@ -337,7 +367,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
 
             is PhoneNumberUnknown -> {
                 internalFeedback = context.getString(
-                    R.string.consult_balance_internal_feedback,
+                    R.string.sms_operation_unknown_internal,
                     e.phoneNumber
                 )
                 userFeedback = context.getString(R.string.sms_operation_unknown_user)
@@ -348,6 +378,15 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                     context.getString(R.string.transfer_money_internal_insufficient_balance)
                 userFeedback =
                     context.getString(R.string.transfer_money_user_insufficient_balance)
+            }
+
+            is NotAnNPCBankAccount -> {
+                internalFeedback =
+                    context.getString(
+                        R.string.transfer_money_internal_not_npc_account,
+                        e.bankAccount
+                    )
+                userFeedback = null
             }
 
             else -> {

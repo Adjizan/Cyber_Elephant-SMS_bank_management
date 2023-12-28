@@ -4,6 +4,6 @@ import com.cyberelephant.bank.data.BankAccountRepository
 
 class ConsultBalanceUseCase(private val bankAccountRepository: BankAccountRepository) {
     suspend fun call(phoneNumber: String): Pair<String, Double> {
-        return bankAccountRepository.consultBalanceFor(phoneNumber)
+        return bankAccountRepository.consultBalanceForPhoneNumber(phoneNumber)
     }
 }
