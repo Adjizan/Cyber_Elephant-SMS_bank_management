@@ -14,8 +14,8 @@ import com.cyberelephant.bank.domain.use_case.LoadAllBankAccountsUseCase
 import com.cyberelephant.bank.domain.use_case.RequireHelpUseCase
 import com.cyberelephant.bank.domain.use_case.TransferUseCase
 import com.cyberelephant.bank.domain.use_case.VerifyCommandUseCase
-import com.cyberelephant.bank.presentation.accounts.AddBankAccountViewModel
 import com.cyberelephant.bank.presentation.accounts.BankAccountPageViewModel
+import com.cyberelephant.bank.presentation.accounts.ModifyBankAccountViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -46,5 +46,5 @@ val cyberElephantModule = module {
         SmsReceiver()
     }
     viewModel<BankAccountPageViewModel> { BankAccountPageViewModel(get()) }
-    viewModel<AddBankAccountViewModel> { AddBankAccountViewModel(get()) }
+    viewModel<ModifyBankAccountViewModel> { ModifyBankAccountViewModel(get()) }
 }

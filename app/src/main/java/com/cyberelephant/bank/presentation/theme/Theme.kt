@@ -78,3 +78,5 @@ val xxxLargeMargin = 40.dp
 
 val horizontalMargin = normalMargin * 2
 val verticalMargin = normalMargin * 2
+
+val modalBottomSheet = 400.dp

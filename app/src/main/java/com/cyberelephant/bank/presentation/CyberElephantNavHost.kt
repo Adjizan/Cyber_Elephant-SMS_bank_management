@@ -23,10 +23,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.cyberelephant.bank.R
-import com.cyberelephant.bank.presentation.accounts.AddBankAccountBottomSheet
-import com.cyberelephant.bank.presentation.accounts.AddBankAccountViewModel
 import com.cyberelephant.bank.presentation.accounts.BankAccountPage
 import com.cyberelephant.bank.presentation.accounts.BankAccountPageViewModel
+import com.cyberelephant.bank.presentation.accounts.ModifyBankAccountBottomSheet
+import com.cyberelephant.bank.presentation.accounts.ModifyBankAccountViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,8 +80,8 @@ fun CyberElephantNavHost() {
         }
 
         if (showAddBankAccount.value) {
-            AddBankAccountBottomSheet(
-                viewModel = koinViewModel<AddBankAccountViewModel>(),
+            ModifyBankAccountBottomSheet(
+                viewModel = koinViewModel<ModifyBankAccountViewModel>(),
                 onDismiss = { showAddBankAccount.value = false }
             ) { showAddBankAccount.value = false }
         }

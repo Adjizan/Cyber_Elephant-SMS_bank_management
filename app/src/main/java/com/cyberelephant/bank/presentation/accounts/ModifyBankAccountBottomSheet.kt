@@ -7,21 +7,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -29,29 +33,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.cyberelephant.bank.R
 import com.cyberelephant.bank.core.util.ACCOUNT_NUMBER_LENGTH
+import com.cyberelephant.bank.core.util.PHONE_NUMBER_PREFIX
 import com.cyberelephant.bank.core.util.createRandomAccountNumber
 import com.cyberelephant.bank.domain.use_case.CreateBankAccountParams
 import com.cyberelephant.bank.presentation.theme.BankManagementTheme
+import com.cyberelephant.bank.presentation.theme.largeMargin
+import com.cyberelephant.bank.presentation.theme.modalBottomSheet
+import com.cyberelephant.bank.presentation.theme.smallMargin
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddBankAccountBottomSheet(
-    viewModel: AddBankAccountViewModel,
+fun ModifyBankAccountBottomSheet(
+    viewModel: ModifyBankAccountViewModel,
     onDismiss: (() -> Unit)? = null,
-    onValidate: (() -> Unit)? = null
+    onValidate: ((Boolean?) -> Unit)? = null
 ) {
-    val newAccountFormData = remember {
-        mutableStateOf(
-            NewAccountFormData(
-                TextFieldValue(""),
-                TextFieldValue(createRandomAccountNumber()),
-                TextFieldValue("+33")
-            )
-        )
-    }
 
-
-    // TODO Error control and validation
     BankManagementTheme {
 
         ModalBottomSheet(
@@ -61,12 +59,34 @@ fun AddBankAccountBottomSheet(
             })
         ) {
 
+            val newAccountFormData = remember {
+                val accountNumber = createRandomAccountNumber()
+                mutableStateOf(
+                    NewAccountFormData(
+                        TextFieldValue(""),
+                        TextFieldValue(accountNumber, selection = TextRange(accountNumber.length)),
+                        TextFieldValue(
+                            PHONE_NUMBER_PREFIX, selection = TextRange(PHONE_NUMBER_PREFIX.length)
+                        )
+                    )
+                )
+            }
+
+            val coroutineScope = rememberCoroutineScope()
+
             Column(
                 modifier = Modifier
-                    .height(400.dp)
-                    .padding(16.dp)
+                    .height(modalBottomSheet)
+                    .fillMaxWidth()
+                    .padding(horizontal = largeMargin)
             ) {
-                Text(text = stringResource(R.string.add_account_sheet_title))
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(smallMargin),
+                    text = stringResource(R.string.add_account_sheet_title),
+                    textAlign = TextAlign.Center
+                )
                 Column(
                     modifier = Modifier
                         .verticalScroll(rememberScrollState())
@@ -81,7 +101,11 @@ fun AddBankAccountBottomSheet(
                             newAccountFormData.value = newAccountFormData.value.copy(name = it)
                         },
                         label = { Text(text = stringResource(R.string.add_account_sheet_name_label)) },
-                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Words,
+                            imeAction = ImeAction.Next
+                        ),
+                        isError = !newAccountFormData.value.nameIsValid,
                         singleLine = true
                     )
                     TextField(
@@ -100,26 +124,34 @@ fun AddBankAccountBottomSheet(
                                 )
                             )
                         },
-                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Characters,
+                            imeAction = ImeAction.Next
+                        ),
                         singleLine = true,
-                        isError = newAccountFormData.value.accountNumber.text.length != ACCOUNT_NUMBER_LENGTH
+                        isError = !newAccountFormData.value.accountNumberIsValid
                     )
                     TextField(
                         modifier = Modifier.fillMaxWidth(),
                         value = newAccountFormData.value.phoneNumber,
                         onValueChange = {
-                            newAccountFormData.value =
-                                newAccountFormData.value.copy(phoneNumber = it)
+                            if (Regex("^\\+?\\d*$").matches(it.text)) {
+                                newAccountFormData.value =
+                                    newAccountFormData.value.copy(phoneNumber = it)
+                            }
                         },
                         label = { Text(text = stringResource(R.string.add_account_sheet_phone_number_label)) },
                         singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Phone, imeAction = ImeAction.Next
+                        ),
+                        isError = !newAccountFormData.value.phoneNumberIsValid
                     )
                     TextField(
                         modifier = Modifier.fillMaxWidth(),
                         value = newAccountFormData.value.balance,
                         onValueChange = {
-                            if (Regex("^[-+]?\\d*$").matches(it.text)) {
+                            if (Regex("^[-+]?\\d*[\\\\.,]?\\d*$").matches(it.text)) {
                                 newAccountFormData.value =
                                     newAccountFormData.value.copy(balance = it)
                             }
@@ -127,7 +159,14 @@ fun AddBankAccountBottomSheet(
                         label = { Text(text = stringResource(R.string.add_account_sheet_balance_label)) },
                         singleLine = true,
                         placeholder = { Text(text = "0.0") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        keyboardActions = KeyboardActions(onDone = {
+                            if (newAccountFormData.value.everythingSFine) {
+                                viewModel.createBankAccount(newAccountFormData.value.toUseCaseParams())
+                            }
+                        }),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number, imeAction = ImeAction.Send
+                        )
                     )
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Checkbox(checked = false, onCheckedChange = {
@@ -146,19 +185,24 @@ fun AddBankAccountBottomSheet(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    TextButton(
+                    Button(
                         onClick = { onDismiss?.invoke() },
                         modifier = Modifier.padding(8.dp),
                     ) {
                         Text(stringResource(R.string.generic_cancel))
                     }
-                    TextButton(
+                    Button(
+                        modifier = Modifier.padding(8.dp),
                         onClick = {
-                            viewModel.createBankAccount(newAccountFormData.value.toUseCaseParams())
-                            onValidate?.invoke()
+                            coroutineScope.launch {
+                                viewModel.createBankAccount(newAccountFormData.value.toUseCaseParams())
+                                    .collect {
+                                        onValidate?.invoke(it)
+                                    }
+                            }
                             onDismiss?.invoke()
                         },
-                        modifier = Modifier.padding(8.dp),
+                        enabled = newAccountFormData.value.everythingSFine
                     ) {
                         Text(stringResource(R.string.add_account_sheet_validate_button_label))
                     }
@@ -174,12 +218,29 @@ private data class NewAccountFormData(
     var phoneNumber: TextFieldValue = TextFieldValue(),
     var balance: TextFieldValue = TextFieldValue(),
     var isOrga: Boolean = false
-)
+) {
+    val nameIsValid: Boolean
+        get() = name.text.isNotEmpty()
+    val accountNumberIsValid: Boolean
+        get() = accountNumber.text.length == ACCOUNT_NUMBER_LENGTH
+
+    val phoneNumberIsValid: Boolean
+        get() = phoneNumber.text.isEmpty()
+                || (phoneNumber.text.first() == '0' && phoneNumber.text.length == 10)
+                || (phoneNumber.text.first() == '+' && phoneNumber.text.length == 12)
+
+    val everythingSFine: Boolean
+        get() = nameIsValid && accountNumberIsValid && phoneNumberIsValid
+}
 
 private fun NewAccountFormData.toUseCaseParams() = CreateBankAccountParams(
-    name = name.text,
-    accountNumber = accountNumber.text,
-    phoneNumber = phoneNumber.text,
-    balance = balance.text.toDouble(),
+    name = name.text.trim(),
+    accountNumber = accountNumber.text.trim(),
+    phoneNumber = phoneNumber.text.trim(),
+    balance = try {
+        balance.text.toDouble()
+    } catch (e: NumberFormatException) {
+        0.0
+    },
     isOrga = isOrga,
 )
