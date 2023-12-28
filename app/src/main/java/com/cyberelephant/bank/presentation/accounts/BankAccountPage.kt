@@ -45,7 +45,7 @@ fun BankAccountPage(
     viewModel: BankAccountPageViewModel
 ) {
 
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.loadAccounts().collectAsState(BankAccountLoading())
 
     when (uiState) {
         is BankAccountLoaded ->

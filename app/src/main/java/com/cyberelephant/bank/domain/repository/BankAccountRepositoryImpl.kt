@@ -8,10 +8,11 @@ import com.cyberelephant.bank.data.BankAccountDao
 import com.cyberelephant.bank.data.BankAccountEntity
 import com.cyberelephant.bank.data.BankAccountRepository
 import com.cyberelephant.bank.data.TransferSuccessful
+import kotlinx.coroutines.flow.Flow
 
 class BankAccountRepositoryImpl(private val bankAccountDao: BankAccountDao) :
     BankAccountRepository {
-    override suspend fun allAccounts(): List<BankAccountEntity> = bankAccountDao.allAccounts()
+    override fun allAccounts(): Flow<List<BankAccountEntity>> = bankAccountDao.allAccounts()
 
     override suspend fun associatePhoneNumber(bankAccount: String, phoneNumber: String): String {
         val entity = bankAccountDao.searchAccount(bankAccount)

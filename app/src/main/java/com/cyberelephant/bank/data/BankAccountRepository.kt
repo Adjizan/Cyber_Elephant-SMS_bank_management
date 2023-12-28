@@ -1,7 +1,9 @@
 package com.cyberelephant.bank.data
 
+import kotlinx.coroutines.flow.Flow
+
 interface BankAccountRepository {
-    suspend fun allAccounts(): List<BankAccountEntity>
+    fun allAccounts(): Flow<List<BankAccountEntity>>
     suspend fun associatePhoneNumber(bankAccount: String, phoneNumber: String): String
     suspend fun consultBalanceFor(phoneNumber: String): Pair<String, Double>
     suspend fun transferFunds(

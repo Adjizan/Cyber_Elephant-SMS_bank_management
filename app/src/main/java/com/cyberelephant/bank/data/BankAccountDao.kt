@@ -4,12 +4,13 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class BankAccountDao {
 
     @Query("SELECT * FROM BANK_ACCOUNT ORDER BY name, is_organizer ASC")
-    abstract suspend fun allAccounts(): List<BankAccountEntity>
+    abstract fun allAccounts(): Flow<List<BankAccountEntity>>
 
     @Query("SELECT * FROM BANK_ACCOUNT WHERE accountNumber = :bankAccount")
     abstract suspend fun searchAccount(bankAccount: String): BankAccountEntity?
