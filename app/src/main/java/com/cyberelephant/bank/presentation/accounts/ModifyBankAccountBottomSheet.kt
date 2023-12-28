@@ -1,5 +1,7 @@
 package com.cyberelephant.bank.presentation.accounts
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
@@ -41,6 +44,7 @@ import com.cyberelephant.bank.presentation.theme.BankManagementTheme
 import com.cyberelephant.bank.presentation.theme.largeMargin
 import com.cyberelephant.bank.presentation.theme.modalBottomSheet
 import com.cyberelephant.bank.presentation.theme.smallMargin
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,6 +58,8 @@ fun ModifyBankAccountBottomSheet(
 
     BankManagementTheme {
 
+        val currentContext = LocalContext.current
+
         ModalBottomSheet(
             onDismissRequest = { onDismiss?.invoke() },
             sheetState = rememberModalBottomSheetState(confirmValueChange = {
@@ -61,23 +67,22 @@ fun ModifyBankAccountBottomSheet(
             })
         ) {
 
-            val newAccountFormData = remember {
+            val currentAccountFormData = remember {
 
                 mutableStateOf(bankAccount?.let {
-                    NewAccountFormData.create(
+                    CurrentAccountFormData.create(
                         it.name,
                         it.accountNumber,
                         it.phoneNumber,
                         it.balance,
                     )
                 } ?: run {
-                    NewAccountFormData.create(
+                    CurrentAccountFormData.create(
                         "",
                         createRandomAccountNumber(),
                         PHONE_NUMBER_PREFIX,
                     )
-                }
-                )
+                })
             }
 
             val coroutineScope = rememberCoroutineScope()
@@ -104,24 +109,25 @@ fun ModifyBankAccountBottomSheet(
                 ) {
                     TextField(
                         modifier = Modifier.fillMaxWidth(),
-                        value = newAccountFormData.value.name,
+                        value = currentAccountFormData.value.name,
                         onValueChange = {
-                            newAccountFormData.value = newAccountFormData.value.copy(name = it)
+                            currentAccountFormData.value =
+                                currentAccountFormData.value.copy(name = it)
                         },
                         label = { Text(text = stringResource(R.string.add_account_sheet_name_label)) },
                         keyboardOptions = KeyboardOptions(
                             capitalization = KeyboardCapitalization.Words,
                             imeAction = ImeAction.Next
                         ),
-                        isError = !newAccountFormData.value.nameIsValid,
+                        isError = !currentAccountFormData.value.nameIsValid,
                         singleLine = true
                     )
                     TextField(
                         modifier = Modifier.fillMaxWidth(),
-                        value = newAccountFormData.value.accountNumber,
+                        value = currentAccountFormData.value.accountNumber,
                         onValueChange = {
-                            newAccountFormData.value =
-                                newAccountFormData.value.copy(accountNumber = it)
+                            currentAccountFormData.value =
+                                currentAccountFormData.value.copy(accountNumber = it)
                         },
                         label = { Text(text = stringResource(R.string.add_account_sheet_account_number_label)) },
                         supportingText = {
@@ -137,15 +143,15 @@ fun ModifyBankAccountBottomSheet(
                             imeAction = ImeAction.Next
                         ),
                         singleLine = true,
-                        isError = !newAccountFormData.value.accountNumberIsValid
+                        isError = !currentAccountFormData.value.accountNumberIsValid
                     )
                     TextField(
                         modifier = Modifier.fillMaxWidth(),
-                        value = newAccountFormData.value.phoneNumber,
+                        value = currentAccountFormData.value.phoneNumber,
                         onValueChange = {
                             if (Regex("^\\+?\\d*$").matches(it.text)) {
-                                newAccountFormData.value =
-                                    newAccountFormData.value.copy(phoneNumber = it)
+                                currentAccountFormData.value =
+                                    currentAccountFormData.value.copy(phoneNumber = it)
                             }
                         },
                         label = { Text(text = stringResource(R.string.add_account_sheet_phone_number_label)) },
@@ -153,27 +159,30 @@ fun ModifyBankAccountBottomSheet(
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Phone, imeAction = ImeAction.Next
                         ),
-                        isError = !newAccountFormData.value.phoneNumberIsValid
+                        isError = !currentAccountFormData.value.phoneNumberIsValid
                     )
                     TextField(
                         modifier = Modifier.fillMaxWidth(),
-                        value = newAccountFormData.value.balance,
+                        value = currentAccountFormData.value.balance,
                         onValueChange = {
                             if (Regex("^[-+]?\\d*[\\\\.,]?\\d*$").matches(it.text)) {
-                                newAccountFormData.value =
-                                    newAccountFormData.value.copy(balance = it)
+                                currentAccountFormData.value =
+                                    currentAccountFormData.value.copy(balance = it)
                             }
                         },
                         label = { Text(text = stringResource(R.string.add_account_sheet_balance_label)) },
                         singleLine = true,
                         placeholder = { Text(text = "0.0") },
-                        keyboardActions = KeyboardActions(onDone = {
-                            if (newAccountFormData.value.everythingSFine) {
-                                viewModel.modifyBankAccount(
-                                    params = newAccountFormData.value.toUseCaseParams(),
-                                    isNewAccount = bankAccount == null
-                                )
-                            }
+                        keyboardActions = KeyboardActions(onSend = {
+                            validateForm(
+                                currentContext,
+                                currentAccountFormData.value,
+                                coroutineScope,
+                                viewModel,
+                                bankAccount,
+                                onValidate,
+                                onDismiss
+                            )
                         }),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number, imeAction = ImeAction.Send
@@ -181,7 +190,8 @@ fun ModifyBankAccountBottomSheet(
                     )
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Checkbox(checked = false, onCheckedChange = {
-                            newAccountFormData.value = newAccountFormData.value.copy(isNPC = it)
+                            currentAccountFormData.value =
+                                currentAccountFormData.value.copy(isNPC = it)
                         })
                         Text(
                             modifier = Modifier
@@ -203,20 +213,17 @@ fun ModifyBankAccountBottomSheet(
                         Text(stringResource(R.string.generic_cancel))
                     }
                     Button(
-                        modifier = Modifier.padding(8.dp),
-                        onClick = {
-                            coroutineScope.launch {
-                                viewModel.modifyBankAccount(
-                                    params = newAccountFormData.value.toUseCaseParams(),
-                                    isNewAccount = bankAccount == null
-                                )
-                                    .collect {
-                                        onValidate?.invoke(it)
-                                    }
-                            }
-                            onDismiss?.invoke()
-                        },
-                        enabled = newAccountFormData.value.everythingSFine
+                        modifier = Modifier.padding(8.dp), onClick = {
+                            validateForm(
+                                currentContext,
+                                currentAccountFormData.value,
+                                coroutineScope,
+                                viewModel,
+                                bankAccount,
+                                onValidate,
+                                onDismiss
+                            )
+                        }, enabled = currentAccountFormData.value.everythingSFine
                     ) {
                         Text(stringResource(R.string.add_account_sheet_validate_button_label))
                     }
@@ -226,7 +233,37 @@ fun ModifyBankAccountBottomSheet(
     }
 }
 
-private data class NewAccountFormData private constructor(
+private fun validateForm(
+    currentContext: Context,
+    currentAccountFormData: CurrentAccountFormData,
+    coroutineScope: CoroutineScope,
+    viewModel: ModifyBankAccountViewModel,
+    bankAccount: UiBankAccount?,
+    onValidate: ((Boolean?) -> Unit)?,
+    onDismiss: (() -> Unit)?,
+) {
+    if (currentAccountFormData.everythingSFine) {
+
+        coroutineScope.launch {
+            viewModel.modifyBankAccount(
+                params = currentAccountFormData.toUseCaseParams(),
+                isNewAccount = bankAccount == null
+            ).collect {
+                if (it != null) {
+                    Toast.makeText(
+                        currentContext,
+                        "Compte ${currentAccountFormData.accountNumber.text} MaJ",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    onValidate?.invoke(it)
+                    onDismiss?.invoke()
+                }
+            }
+        }
+    }
+}
+
+private data class CurrentAccountFormData private constructor(
     var name: TextFieldValue,
     var accountNumber: TextFieldValue,
     var phoneNumber: TextFieldValue,
@@ -239,9 +276,7 @@ private data class NewAccountFormData private constructor(
         get() = accountNumber.text.length == ACCOUNT_NUMBER_LENGTH
 
     val phoneNumberIsValid: Boolean
-        get() = phoneNumber.text.isEmpty()
-                || (phoneNumber.text.first() == '0' && phoneNumber.text.length == 10)
-                || (phoneNumber.text.first() == '+' && phoneNumber.text.length == 12)
+        get() = phoneNumber.text.isEmpty() || (phoneNumber.text.first() == '0' && phoneNumber.text.length == 10) || (phoneNumber.text.first() == '+' && phoneNumber.text.length == 12)
 
     val everythingSFine: Boolean
         get() = nameIsValid && accountNumberIsValid && phoneNumberIsValid
@@ -253,21 +288,18 @@ private data class NewAccountFormData private constructor(
             phoneNumber: String? = null,
             balance: Double? = null,
             isNPC: Boolean = false
-        ): NewAccountFormData {
+        ): CurrentAccountFormData {
             val formattedBalance = "%.2f".format(balance)
-            return NewAccountFormData(
+            return CurrentAccountFormData(
                 name = TextFieldValue(name, selection = TextRange(name.length)),
                 accountNumber = TextFieldValue(
-                    accountNumber,
-                    selection = TextRange(accountNumber.length)
+                    accountNumber, selection = TextRange(accountNumber.length)
                 ),
                 phoneNumber = TextFieldValue(
-                    phoneNumber ?: "",
-                    selection = TextRange(phoneNumber?.length ?: 0)
+                    phoneNumber ?: "", selection = TextRange(phoneNumber?.length ?: 0)
                 ),
                 balance = TextFieldValue(
-                    formattedBalance,
-                    selection = TextRange(formattedBalance.length)
+                    formattedBalance, selection = TextRange(formattedBalance.length)
                 ),
                 isNPC = isNPC
             )
@@ -275,7 +307,7 @@ private data class NewAccountFormData private constructor(
     }
 }
 
-private fun NewAccountFormData.toUseCaseParams() = ModifyBankAccountParams(
+private fun CurrentAccountFormData.toUseCaseParams() = ModifyBankAccountParams(
     name = name.text.trim(),
     accountNumber = accountNumber.text.trim(),
     phoneNumber = phoneNumber.text.trim(),

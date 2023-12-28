@@ -158,7 +158,7 @@ fun BankAccountRow(uiBankAccount: UiBankAccount, onClick: ((UiBankAccount) -> Un
                 )
                 Text(
                     modifier = subItemModifier,
-                    text = "$balance",
+                    text = "%.2f".format(balance),
                     color = balanceColor,
                     textAlign = TextAlign.End
                 )
