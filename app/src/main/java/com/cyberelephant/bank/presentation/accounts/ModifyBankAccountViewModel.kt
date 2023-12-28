@@ -3,8 +3,10 @@ package com.cyberelephant.bank.presentation.accounts
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cyberelephant.bank.core.util.PHONE_NUMBER_PREFIX
-import com.cyberelephant.bank.domain.use_case.CreateBankAccountParams
+import com.cyberelephant.bank.core.util.debugLog
 import com.cyberelephant.bank.domain.use_case.CreateBankAccountUseCase
+import com.cyberelephant.bank.domain.use_case.ModifyBankAccountParams
+import com.cyberelephant.bank.domain.use_case.UpdateBankAccountUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -14,10 +16,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.time.Duration.Companion.seconds
 
-class ModifyBankAccountViewModel(private val createBankAccountUseCase: CreateBankAccountUseCase) :
+class ModifyBankAccountViewModel(
+    private val createBankAccountUseCase: CreateBankAccountUseCase,
+    private val updateBankAccountUseCase: UpdateBankAccountUseCase
+) :
     ViewModel() {
     @OptIn(FlowPreview::class)
-    fun createBankAccount(params: CreateBankAccountParams): Flow<Boolean?> {
+    fun modifyBankAccount(params: ModifyBankAccountParams, isNewAccount: Boolean): Flow<Boolean?> {
 
         val toSave = params.phoneNumber?.let { phoneNumber ->
             if (phoneNumber.first() == '0') {
@@ -32,9 +37,14 @@ class ModifyBankAccountViewModel(private val createBankAccountUseCase: CreateBan
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    createBankAccountUseCase.call(toSave)
+                    if (isNewAccount) {
+                        createBankAccountUseCase.call(toSave)
+                    } else {
+                        updateBankAccountUseCase.call(toSave)
+                    }
                     flow.value = true
                 } catch (e: Exception) {
+                    debugLog(exception = e)
                     flow.value = false
                 }
             }

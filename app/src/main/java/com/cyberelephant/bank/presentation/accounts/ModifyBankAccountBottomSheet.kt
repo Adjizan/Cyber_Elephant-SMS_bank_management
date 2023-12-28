@@ -35,7 +35,8 @@ import com.cyberelephant.bank.R
 import com.cyberelephant.bank.core.util.ACCOUNT_NUMBER_LENGTH
 import com.cyberelephant.bank.core.util.PHONE_NUMBER_PREFIX
 import com.cyberelephant.bank.core.util.createRandomAccountNumber
-import com.cyberelephant.bank.domain.use_case.CreateBankAccountParams
+import com.cyberelephant.bank.core.util.debugLog
+import com.cyberelephant.bank.domain.use_case.ModifyBankAccountParams
 import com.cyberelephant.bank.presentation.theme.BankManagementTheme
 import com.cyberelephant.bank.presentation.theme.largeMargin
 import com.cyberelephant.bank.presentation.theme.modalBottomSheet
@@ -46,6 +47,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ModifyBankAccountBottomSheet(
     viewModel: ModifyBankAccountViewModel,
+    bankAccount: UiBankAccount? = null,
     onDismiss: (() -> Unit)? = null,
     onValidate: ((Boolean?) -> Unit)? = null
 ) {
@@ -60,15 +62,21 @@ fun ModifyBankAccountBottomSheet(
         ) {
 
             val newAccountFormData = remember {
-                val accountNumber = createRandomAccountNumber()
-                mutableStateOf(
-                    NewAccountFormData(
-                        TextFieldValue(""),
-                        TextFieldValue(accountNumber, selection = TextRange(accountNumber.length)),
-                        TextFieldValue(
-                            PHONE_NUMBER_PREFIX, selection = TextRange(PHONE_NUMBER_PREFIX.length)
-                        )
+
+                mutableStateOf(bankAccount?.let {
+                    NewAccountFormData.create(
+                        it.name,
+                        it.accountNumber,
+                        it.phoneNumber,
+                        it.balance,
                     )
+                } ?: run {
+                    NewAccountFormData.create(
+                        "",
+                        createRandomAccountNumber(),
+                        PHONE_NUMBER_PREFIX,
+                    )
+                }
                 )
             }
 
@@ -161,7 +169,10 @@ fun ModifyBankAccountBottomSheet(
                         placeholder = { Text(text = "0.0") },
                         keyboardActions = KeyboardActions(onDone = {
                             if (newAccountFormData.value.everythingSFine) {
-                                viewModel.createBankAccount(newAccountFormData.value.toUseCaseParams())
+                                viewModel.modifyBankAccount(
+                                    params = newAccountFormData.value.toUseCaseParams(),
+                                    isNewAccount = bankAccount == null
+                                )
                             }
                         }),
                         keyboardOptions = KeyboardOptions(
@@ -170,7 +181,7 @@ fun ModifyBankAccountBottomSheet(
                     )
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Checkbox(checked = false, onCheckedChange = {
-                            newAccountFormData.value = newAccountFormData.value.copy(isOrga = it)
+                            newAccountFormData.value = newAccountFormData.value.copy(isNPC = it)
                         })
                         Text(
                             modifier = Modifier
@@ -195,7 +206,10 @@ fun ModifyBankAccountBottomSheet(
                         modifier = Modifier.padding(8.dp),
                         onClick = {
                             coroutineScope.launch {
-                                viewModel.createBankAccount(newAccountFormData.value.toUseCaseParams())
+                                viewModel.modifyBankAccount(
+                                    params = newAccountFormData.value.toUseCaseParams(),
+                                    isNewAccount = bankAccount == null
+                                )
                                     .collect {
                                         onValidate?.invoke(it)
                                     }
@@ -212,12 +226,12 @@ fun ModifyBankAccountBottomSheet(
     }
 }
 
-private data class NewAccountFormData(
+private data class NewAccountFormData private constructor(
     var name: TextFieldValue,
     var accountNumber: TextFieldValue,
-    var phoneNumber: TextFieldValue = TextFieldValue(),
-    var balance: TextFieldValue = TextFieldValue(),
-    var isOrga: Boolean = false
+    var phoneNumber: TextFieldValue,
+    var balance: TextFieldValue,
+    var isNPC: Boolean = false
 ) {
     val nameIsValid: Boolean
         get() = name.text.isNotEmpty()
@@ -231,16 +245,45 @@ private data class NewAccountFormData(
 
     val everythingSFine: Boolean
         get() = nameIsValid && accountNumberIsValid && phoneNumberIsValid
+
+    companion object {
+        fun create(
+            name: String = "",
+            accountNumber: String = "",
+            phoneNumber: String? = null,
+            balance: Double? = null,
+            isNPC: Boolean = false
+        ): NewAccountFormData {
+            val formattedBalance = "%.2f".format(balance)
+            return NewAccountFormData(
+                name = TextFieldValue(name, selection = TextRange(name.length)),
+                accountNumber = TextFieldValue(
+                    accountNumber,
+                    selection = TextRange(accountNumber.length)
+                ),
+                phoneNumber = TextFieldValue(
+                    phoneNumber ?: "",
+                    selection = TextRange(phoneNumber?.length ?: 0)
+                ),
+                balance = TextFieldValue(
+                    formattedBalance,
+                    selection = TextRange(formattedBalance.length)
+                ),
+                isNPC = isNPC
+            )
+        }
+    }
 }
 
-private fun NewAccountFormData.toUseCaseParams() = CreateBankAccountParams(
+private fun NewAccountFormData.toUseCaseParams() = ModifyBankAccountParams(
     name = name.text.trim(),
     accountNumber = accountNumber.text.trim(),
     phoneNumber = phoneNumber.text.trim(),
     balance = try {
         balance.text.toDouble()
     } catch (e: NumberFormatException) {
+        debugLog(exception = e)
         0.0
     },
-    isOrga = isOrga,
+    isOrga = isNPC,
 )

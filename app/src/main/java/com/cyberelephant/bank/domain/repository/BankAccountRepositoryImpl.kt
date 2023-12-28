@@ -38,7 +38,7 @@ class BankAccountRepositoryImpl(private val bankAccountDao: BankAccountDao) :
         name: String,
         balance: Double,
         phoneNumber: String?,
-        isOrga: Boolean
+        isNPC: Boolean
     ) {
         bankAccountDao.insert(
             BankAccountEntity(
@@ -46,10 +46,19 @@ class BankAccountRepositoryImpl(private val bankAccountDao: BankAccountDao) :
                 phoneNumber,
                 name,
                 balance,
-                isOrga
+                isNPC
             )
         )
     }
+
+    override suspend fun updateBankAccount(
+        accountNumber: String,
+        name: String,
+        balance: Double,
+        phoneNumber: String?,
+        isNPC: Boolean
+    ): Unit = bankAccountDao.updateBankAccount(accountNumber, phoneNumber, name, balance, isNPC)
+
 
     override suspend fun transferFunds(
         fromAccount: String,

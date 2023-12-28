@@ -17,6 +17,7 @@ class TransferUseCase(private val bankAccountRepository: BankAccountRepository) 
 }
 
 data class TransferParam private constructor(
+    // FIXME account is different from phone number
     val fromAccount: String,
     val destinationBankAccount: String,
     val amount: Double,

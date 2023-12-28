@@ -49,4 +49,25 @@ abstract class BankAccountDao {
 
     @Insert
     abstract suspend fun insert(bankAccountEntity: BankAccountEntity)
+
+    @Query(
+        """
+        UPDATE bank_account
+            SET 
+                name = :name,
+                current_balance = :balance,
+                phone_number = :phoneNumber,
+                is_organizer = :orga
+            WHERE
+                accountNumber = :accountNumber
+    """
+    )
+    abstract suspend fun updateBankAccount(
+        accountNumber: String,
+        phoneNumber: String?,
+        name: String,
+        balance: Double,
+        orga: Boolean
+    )
+
 }

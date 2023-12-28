@@ -19,7 +19,15 @@ interface BankAccountRepository {
         name: String,
         balance: Double,
         phoneNumber: String?,
-        isOrga: Boolean
+        isNPC: Boolean
+    )
+
+    suspend fun updateBankAccount(
+        accountNumber: String,
+        name: String,
+        balance: Double,
+        phoneNumber: String?,
+        isNPC: Boolean
     )
 
 }

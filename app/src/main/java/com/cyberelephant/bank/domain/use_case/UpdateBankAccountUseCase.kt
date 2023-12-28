@@ -3,11 +3,11 @@ package com.cyberelephant.bank.domain.use_case
 import com.cyberelephant.bank.core.util.debugLog
 import com.cyberelephant.bank.data.BankAccountRepository
 
-class CreateBankAccountUseCase(private val bankAccountRepository: BankAccountRepository) {
+class UpdateBankAccountUseCase(private val bankAccountRepository: BankAccountRepository) {
 
     suspend fun call(params: ModifyBankAccountParams): Boolean {
         return try {
-            bankAccountRepository.createBankAccount(
+            bankAccountRepository.updateBankAccount(
                 accountNumber = params.accountNumber,
                 name = params.name,
                 balance = params.balance,
@@ -19,14 +19,7 @@ class CreateBankAccountUseCase(private val bankAccountRepository: BankAccountRep
             debugLog(exception = e)
             false
         }
+
     }
 
 }
-
-data class ModifyBankAccountParams(
-    val accountNumber: String,
-    val name: String,
-    val balance: Double,
-    val phoneNumber: String?,
-    val isOrga: Boolean
-)

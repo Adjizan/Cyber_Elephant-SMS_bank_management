@@ -13,6 +13,7 @@ import com.cyberelephant.bank.domain.use_case.CreateBankAccountUseCase
 import com.cyberelephant.bank.domain.use_case.LoadAllBankAccountsUseCase
 import com.cyberelephant.bank.domain.use_case.RequireHelpUseCase
 import com.cyberelephant.bank.domain.use_case.TransferUseCase
+import com.cyberelephant.bank.domain.use_case.UpdateBankAccountUseCase
 import com.cyberelephant.bank.domain.use_case.VerifyCommandUseCase
 import com.cyberelephant.bank.presentation.accounts.BankAccountPageViewModel
 import com.cyberelephant.bank.presentation.accounts.ModifyBankAccountViewModel
@@ -23,9 +24,7 @@ import org.koin.dsl.module
 val cyberElephantModule = module {
     single<BankManagementDatabase> {
         Room.databaseBuilder(
-            androidContext(),
-            BankManagementDatabase::class.java,
-            "cyber_elephant_bank_management"
+            androidContext(), BankManagementDatabase::class.java, "cyber_elephant_bank_management"
         ).build()
     }
 
@@ -38,6 +37,7 @@ val cyberElephantModule = module {
     single<BadCommandUseCase> { BadCommandUseCase() }
     single<AssociatePhoneNumberUseCase> { AssociatePhoneNumberUseCase(get()) }
     single<CreateBankAccountUseCase> { CreateBankAccountUseCase(get()) }
+    single<UpdateBankAccountUseCase> { UpdateBankAccountUseCase(get()) }
     single<ConsultBalanceUseCase> { ConsultBalanceUseCase(get()) }
     single<TransferUseCase> { TransferUseCase(get()) }
     single<RequireHelpUseCase> { RequireHelpUseCase(get()) }
@@ -46,5 +46,5 @@ val cyberElephantModule = module {
         SmsReceiver()
     }
     viewModel<BankAccountPageViewModel> { BankAccountPageViewModel(get()) }
-    viewModel<ModifyBankAccountViewModel> { ModifyBankAccountViewModel(get()) }
+    viewModel<ModifyBankAccountViewModel> { ModifyBankAccountViewModel(get(), get()) }
 }
