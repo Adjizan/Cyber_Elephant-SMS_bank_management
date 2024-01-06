@@ -71,7 +71,6 @@ fun CyberElephantNavHost() {
                         Icons.Filled.Add
                     }
                 })
-                // TODO reload bank account data when adding a new account
                 BankAccountPage(
                     modifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
                     navController = navController,
