@@ -1,7 +1,10 @@
 package com.cyberelephant.bank.presentation
 
 import android.Manifest
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -9,11 +12,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavHostController
 import com.cyberelephant.bank.R
 import com.cyberelephant.bank.presentation.theme.verticalMargin
@@ -22,11 +27,17 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import kotlinx.coroutines.launch
 
 
+@androidx.annotation.OptIn(UnstableApi::class)
 @Composable
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
-fun MainPage(navController: NavHostController, modifier: Modifier) {
+fun MainPage(
+    navController: NavHostController,
+    modifier: Modifier,
+    viewModel: MainPageViewModel
+) {
 
     val localContext = LocalContext.current
 
@@ -37,6 +48,57 @@ fun MainPage(navController: NavHostController, modifier: Modifier) {
             Manifest.permission.RECEIVE_SMS
         )
     )
+
+    val coroutineScope = rememberCoroutineScope()
+
+    val chooseFileToImport =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) { documentUri ->
+            if (documentUri == null) {
+                Toast.makeText(
+                    localContext,
+                    localContext.getString(R.string.import_bank_accounts_no_file_selected),
+                    Toast.LENGTH_SHORT
+                )
+                    .show()
+                return@rememberLauncherForActivityResult
+            }
+
+            val uri: Uri = documentUri
+
+            val contentResolver = localContext.contentResolver
+            coroutineScope.launch {
+                viewModel.importBankCSVData(contentResolver.openInputStream(uri)).collect {
+                    when (it) {
+                        true -> {
+                            Toast.makeText(
+                                localContext,
+                                localContext.getString(R.string.bank_account_import_success),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        false -> {
+                            Toast.makeText(
+                                localContext,
+                                localContext.getString(R.string.bank_account_import_failure),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        else -> {
+                            Toast.makeText(
+                                localContext,
+                                localContext.getString(R.string.bank_account_import_in_progress),
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                        }
+                    }
+                }
+
+            }
+        }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -56,16 +118,16 @@ fun MainPage(navController: NavHostController, modifier: Modifier) {
 
         Button(
             modifier = Modifier.padding(vertical = verticalMargin), onClick = {
-                Toast.makeText(localContext, "TODO", Toast.LENGTH_SHORT).show()
+                chooseFileToImport.launch(arrayOf("text/comma-separated-values"))
             }) {
-            Text(text = stringResource(R.string.home_export_label))
+            Text(text = stringResource(R.string.home_import_label))
         }
 
         Button(
             modifier = Modifier.padding(vertical = verticalMargin), onClick = {
                 Toast.makeText(localContext, "TODO", Toast.LENGTH_SHORT).show()
             }) {
-            Text(text = stringResource(R.string.home_import_label))
+            Text(text = stringResource(R.string.home_export_label))
         }
 
         Button(

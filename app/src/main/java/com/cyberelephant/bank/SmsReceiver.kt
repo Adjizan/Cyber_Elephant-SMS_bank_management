@@ -7,7 +7,6 @@ import android.os.Build
 import android.telephony.SmsManager
 import android.telephony.SmsMessage
 import android.widget.Toast
-import com.cyberelephant.bank.core.util.debugLog
 import com.cyberelephant.bank.core.util.exception.BankAccountAlreadyLinked
 import com.cyberelephant.bank.core.util.exception.BankAccountUnknown
 import com.cyberelephant.bank.core.util.exception.InsufficientBalance
@@ -30,6 +29,7 @@ import com.cyberelephant.bank.domain.use_case.RequireHelpUseCase
 import com.cyberelephant.bank.domain.use_case.VerifyCommandUseCase
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import timber.log.Timber
 
 class SmsReceiver : BroadcastReceiver(), KoinComponent {
 
@@ -167,7 +167,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                     requireHelpUseCase.call(phoneNumber).joinToString { "- $it\n" }
                 )
             } catch (e: Exception) {
-                debugLog(exception = e)
+                Timber.e(e)
                 val feedbacks = handleException(context, e)
                 internalFeedback = feedbacks.first
                 userFeedback = feedbacks.second!!
@@ -233,7 +233,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                         fundsTransferParam.destinationBankAccount
                     )
             } catch (e: Exception) {
-                debugLog(exception = e)
+                Timber.e(e)
                 val feedbacks = handleException(context, e)
                 internalFeedback = feedbacks.first
             }
@@ -261,7 +261,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                     nameBalance.second,
                 )
             } catch (e: Exception) {
-                debugLog(exception = e)
+                Timber.e(e)
                 val feedbacks = handleException(context, e)
                 internalFeedback = feedbacks.first
                 userFeedback = feedbacks.second!!
@@ -295,7 +295,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                 userFeedback = context.getString(R.string.link_phone_and_account_user_success, name)
 
             } catch (e: Exception) {
-                debugLog(exception = e)
+                Timber.e(e)
                 val feedbacks = handleException(context, e)
                 internalFeedback = feedbacks.first
                 userFeedback = feedbacks.second!!

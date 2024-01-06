@@ -80,4 +80,13 @@ abstract class BankAccountDao {
     )
     abstract suspend fun searchAccountByPhone(phoneNumber: String): BankAccountEntity?
 
+    @Query("DELETE FROM bank_account")
+    abstract suspend fun deleteAll()
+
+    @Transaction
+    open suspend fun clearAndImport(bankAccounts: List<BankAccountEntity>) {
+        deleteAll()
+        bankAccounts.map { insert(it) }
+    }
+
 }

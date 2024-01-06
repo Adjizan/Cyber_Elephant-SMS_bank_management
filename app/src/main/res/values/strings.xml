@@ -45,4 +45,8 @@
     <string name="generic_cancel">Annuler</string>
     <string name="add_account_sheet_validate_button_label">Créer le compte</string>
     <string name="add_account_sheet_account_number_help">Longueur = %1$s</string>
+    <string name="import_bank_accounts_no_file_selected">Aucun fichier sélectionné.</string>
+    <string name="bank_account_import_success">Import réussi</string>
+    <string name="bank_account_import_failure">Import échoué</string>
+    <string name="bank_account_import_in_progress">Import en cours</string>
 </resources>

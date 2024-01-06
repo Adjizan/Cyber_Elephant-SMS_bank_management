@@ -1,5 +1,6 @@
 package com.cyberelephant.bank.data
 
+import com.cyberelephant.bank.domain.use_case.ModifyBankAccountParams
 import kotlinx.coroutines.flow.Flow
 
 interface BankAccountRepository {
@@ -13,13 +14,8 @@ interface BankAccountRepository {
     ): TransferSuccessful
 
     suspend fun isOrganizer(phoneNumber: String): Boolean
-    suspend fun createBankAccount(
-        accountNumber: String,
-        name: String,
-        balance: Double,
-        phoneNumber: String?,
-        isNPC: Boolean
-    )
+    suspend fun createBankAccount(newBankAccount: ModifyBankAccountParams)
+    suspend fun clearAndImportAccounts(newBankAccounts: List<ModifyBankAccountParams>)
 
     suspend fun updateBankAccount(
         accountNumber: String,
@@ -35,4 +31,5 @@ interface BankAccountRepository {
         amount: Double,
     ): TransferSuccessful
 
+    suspend fun wipeAll()
 }

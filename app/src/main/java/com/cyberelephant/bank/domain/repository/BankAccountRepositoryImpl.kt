@@ -5,10 +5,13 @@ import com.cyberelephant.bank.core.util.exception.BankAccountUnknown
 import com.cyberelephant.bank.core.util.exception.InsufficientBalance
 import com.cyberelephant.bank.core.util.exception.NotAnNPCBankAccount
 import com.cyberelephant.bank.core.util.exception.PhoneNumberUnknown
+import com.cyberelephant.bank.core.util.extension.toEntities
+import com.cyberelephant.bank.core.util.extension.toEntity
 import com.cyberelephant.bank.data.BankAccountDao
 import com.cyberelephant.bank.data.BankAccountEntity
 import com.cyberelephant.bank.data.BankAccountRepository
 import com.cyberelephant.bank.data.TransferSuccessful
+import com.cyberelephant.bank.domain.use_case.ModifyBankAccountParams
 import kotlinx.coroutines.flow.Flow
 
 class BankAccountRepositoryImpl(private val bankAccountDao: BankAccountDao) :
@@ -29,23 +32,13 @@ class BankAccountRepositoryImpl(private val bankAccountDao: BankAccountDao) :
             Pair(it.name, it.currentBalance)
         } ?: run { throw PhoneNumberUnknown(phoneNumber) }
 
-    override suspend fun createBankAccount(
-        accountNumber: String,
-        name: String,
-        balance: Double,
-        phoneNumber: String?,
-        isNPC: Boolean
-    ) {
-        bankAccountDao.insert(
-            BankAccountEntity(
-                accountNumber,
-                phoneNumber,
-                name,
-                balance,
-                isNPC
-            )
-        )
+    override suspend fun createBankAccount(newBankAccount: ModifyBankAccountParams) =
+        bankAccountDao.insert(newBankAccount.toEntity())
+
+    override suspend fun clearAndImportAccounts(newBankAccounts: List<ModifyBankAccountParams>) {
+        bankAccountDao.clearAndImport(newBankAccounts.toEntities())
     }
+
 
     override suspend fun updateBankAccount(
         accountNumber: String,
@@ -109,6 +102,8 @@ class BankAccountRepositoryImpl(private val bankAccountDao: BankAccountDao) :
         return bankAccountDao.isOrganizer(phoneNumber)
             ?: run { throw PhoneNumberUnknown(phoneNumber) }
     }
+
+    override suspend fun wipeAll() = bankAccountDao.deleteAll()
 
     private suspend fun searchAccountByNumber(accountNumber: String): BankAccountEntity =
         bankAccountDao.searchAccount(accountNumber)

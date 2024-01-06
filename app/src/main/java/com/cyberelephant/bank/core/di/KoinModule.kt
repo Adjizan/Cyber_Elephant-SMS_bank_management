@@ -8,6 +8,7 @@ import com.cyberelephant.bank.data.BankManagementDatabase
 import com.cyberelephant.bank.domain.repository.BankAccountRepositoryImpl
 import com.cyberelephant.bank.domain.use_case.AssociatePhoneNumberUseCase
 import com.cyberelephant.bank.domain.use_case.BadCommandUseCase
+import com.cyberelephant.bank.domain.use_case.ClearAndImportBankAccountsUseCase
 import com.cyberelephant.bank.domain.use_case.ConsultBalanceUseCase
 import com.cyberelephant.bank.domain.use_case.CreateBankAccountUseCase
 import com.cyberelephant.bank.domain.use_case.FundsTransferUseCase
@@ -15,6 +16,7 @@ import com.cyberelephant.bank.domain.use_case.LoadAllBankAccountsUseCase
 import com.cyberelephant.bank.domain.use_case.RequireHelpUseCase
 import com.cyberelephant.bank.domain.use_case.UpdateBankAccountUseCase
 import com.cyberelephant.bank.domain.use_case.VerifyCommandUseCase
+import com.cyberelephant.bank.presentation.MainPageViewModel
 import com.cyberelephant.bank.presentation.accounts.BankAccountPageViewModel
 import com.cyberelephant.bank.presentation.accounts.ModifyBankAccountViewModel
 import org.koin.android.ext.koin.androidContext
@@ -38,6 +40,7 @@ val cyberElephantModule = module {
     single<AssociatePhoneNumberUseCase> { AssociatePhoneNumberUseCase(get()) }
     single<CreateBankAccountUseCase> { CreateBankAccountUseCase(get()) }
     single<UpdateBankAccountUseCase> { UpdateBankAccountUseCase(get()) }
+    single<ClearAndImportBankAccountsUseCase> { ClearAndImportBankAccountsUseCase(get()) }
     single<ConsultBalanceUseCase> { ConsultBalanceUseCase(get()) }
     single<FundsTransferUseCase> { FundsTransferUseCase(get()) }
     single<RequireHelpUseCase> { RequireHelpUseCase(get()) }
@@ -45,6 +48,7 @@ val cyberElephantModule = module {
     single<SmsReceiver> {
         SmsReceiver()
     }
+    viewModel<MainPageViewModel> { MainPageViewModel(get()) }
     viewModel<BankAccountPageViewModel> { BankAccountPageViewModel(get()) }
     viewModel<ModifyBankAccountViewModel> { ModifyBankAccountViewModel(get(), get()) }
 }

@@ -58,7 +58,8 @@ fun CyberElephantNavHost() {
                 appBarActions.value = null
                 MainPage(
                     modifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
-                    navController = navController
+                    navController = navController,
+                    viewModel = koinViewModel<MainPageViewModel>()
                 )
             }
             composable(CyberElephantRoutes.BANK_ACCOUNTS.name) {

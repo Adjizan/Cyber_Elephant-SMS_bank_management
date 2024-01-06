@@ -38,7 +38,6 @@ import com.cyberelephant.bank.R
 import com.cyberelephant.bank.core.util.ACCOUNT_NUMBER_LENGTH
 import com.cyberelephant.bank.core.util.PHONE_NUMBER_PREFIX
 import com.cyberelephant.bank.core.util.createRandomAccountNumber
-import com.cyberelephant.bank.core.util.debugLog
 import com.cyberelephant.bank.domain.use_case.ModifyBankAccountParams
 import com.cyberelephant.bank.presentation.theme.BankManagementTheme
 import com.cyberelephant.bank.presentation.theme.largeMargin
@@ -46,6 +45,7 @@ import com.cyberelephant.bank.presentation.theme.modalBottomSheet
 import com.cyberelephant.bank.presentation.theme.smallMargin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -314,8 +314,8 @@ private fun CurrentAccountFormData.toUseCaseParams() = ModifyBankAccountParams(
     balance = try {
         balance.text.toDouble()
     } catch (e: NumberFormatException) {
-        debugLog(exception = e)
+        Timber.e(e)
         0.0
     },
-    isOrga = isNPC,
+    isNPC = isNPC,
 )

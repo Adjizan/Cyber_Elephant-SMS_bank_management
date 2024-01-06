@@ -1,7 +1,7 @@
 package com.cyberelephant.bank.domain.use_case
 
-import com.cyberelephant.bank.core.util.debugLog
 import com.cyberelephant.bank.data.BankAccountRepository
+import timber.log.Timber
 
 class UpdateBankAccountUseCase(private val bankAccountRepository: BankAccountRepository) {
 
@@ -12,11 +12,11 @@ class UpdateBankAccountUseCase(private val bankAccountRepository: BankAccountRep
                 name = params.name,
                 balance = params.balance,
                 phoneNumber = params.phoneNumber,
-                isNPC = params.isOrga
+                isNPC = params.isNPC
             )
             true
         } catch (e: Exception) {
-            debugLog(exception = e)
+            Timber.e(e)
             false
         }
 
