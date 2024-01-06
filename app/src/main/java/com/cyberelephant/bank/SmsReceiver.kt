@@ -26,6 +26,8 @@ import com.cyberelephant.bank.domain.use_case.ConsultBalanceUseCase
 import com.cyberelephant.bank.domain.use_case.FundsTransferParam
 import com.cyberelephant.bank.domain.use_case.FundsTransferUseCase
 import com.cyberelephant.bank.domain.use_case.RequireHelpUseCase
+import com.cyberelephant.bank.domain.use_case.SaveReceivedSmsUseCase
+import com.cyberelephant.bank.domain.use_case.SaveSentSmsUseCase
 import com.cyberelephant.bank.domain.use_case.VerifyCommandUseCase
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -39,6 +41,8 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
     private val fundsTransferUseCase: FundsTransferUseCase by inject()
     private val requireHelpUseCase: RequireHelpUseCase by inject()
     private val badCommandUseCase: BadCommandUseCase by inject()
+    private val saveReceivedSmsUseCase: SaveReceivedSmsUseCase by inject()
+    private val saveSentSmsUseCase: SaveSentSmsUseCase by inject()
 
     override fun onReceive(context: Context, intent: Intent) {
 
@@ -66,6 +70,9 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
             val originatingAddress =
                 SmsMessage.createFromPdu(pdus[0], pdusFormat).originatingAddress!!
             val originalMessage = message.toString()
+
+            goAsync { saveReceivedSmsUseCase.call(originatingAddress, originalMessage) }
+
             verifyCommandUseCase.call(originalMessage)?.let { command ->
                 when (command) {
                     ConsultBalanceCommand -> handleConsultBalance(
@@ -321,6 +328,8 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
     }
 
     private fun sendSms(context: Context, message: String, phoneNumber: String) {
+        goAsync { saveSentSmsUseCase.call(phoneNumber, message) }
+
         val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             context.getSystemService(SmsManager::class.java)
         } else {

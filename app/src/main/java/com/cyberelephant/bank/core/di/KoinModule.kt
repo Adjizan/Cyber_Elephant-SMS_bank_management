@@ -14,6 +14,8 @@ import com.cyberelephant.bank.domain.use_case.CreateBankAccountUseCase
 import com.cyberelephant.bank.domain.use_case.FundsTransferUseCase
 import com.cyberelephant.bank.domain.use_case.LoadAllBankAccountsUseCase
 import com.cyberelephant.bank.domain.use_case.RequireHelpUseCase
+import com.cyberelephant.bank.domain.use_case.SaveReceivedSmsUseCase
+import com.cyberelephant.bank.domain.use_case.SaveSentSmsUseCase
 import com.cyberelephant.bank.domain.use_case.UpdateBankAccountUseCase
 import com.cyberelephant.bank.domain.use_case.VerifyCommandUseCase
 import com.cyberelephant.bank.presentation.MainPageViewModel
@@ -44,6 +46,8 @@ val cyberElephantModule = module {
     single<ConsultBalanceUseCase> { ConsultBalanceUseCase(get()) }
     single<FundsTransferUseCase> { FundsTransferUseCase(get()) }
     single<RequireHelpUseCase> { RequireHelpUseCase(get()) }
+    single<SaveReceivedSmsUseCase> { SaveReceivedSmsUseCase(get()) }
+    single<SaveSentSmsUseCase> { SaveSentSmsUseCase(get()) }
 
     single<SmsReceiver> {
         SmsReceiver()
