@@ -3,8 +3,9 @@
     <string name="bank_account_title">Comptes en banque</string>
     <string name="generic_user_no_idea">Je ne sais pas ce qu\'il s\'est passé *_*</string>
     <string name="home_current_label">Voir les données actuelles</string>
-    <string name="home_export_label">Export (CSV)</string>
     <string name="home_import_label">Import (CSV)</string>
+    <string name="home_export_label">Export (CSV)</string>
+    <string name="home_sms_list_label">Liste des SMS traités</string>
     <string name="home_help_label">Aide</string>
     <string name="home_permission_ok_label">N\'oubliez pas de laisser tourner l\'app pour que tous les SMS reçus soient bien pris en compte :)</string>
     <string name="home_permission_denied_label">Toutes les permissions n\'ont pas été acceptées (manquantes : %1$s).</string>
@@ -49,4 +50,8 @@
     <string name="bank_account_import_success">Import réussi</string>
     <string name="bank_account_import_failure">Import échoué</string>
     <string name="bank_account_import_in_progress">Import en cours</string>
+    <string name="sms_title">Liste des SMS</string>
+    <string name="sms_list_incoming_sms_filter_accessibility">SMS entrants</string>
+    <string name="sms_list_outgoing_sms_filter_accessibility">SMS sortants</string>
+    <string name="sms_list_all_sms_filter_accessibility">Tous les SMS</string>
 </resources>

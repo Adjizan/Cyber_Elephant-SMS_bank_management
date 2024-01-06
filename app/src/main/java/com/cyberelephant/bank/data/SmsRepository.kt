@@ -1,5 +1,7 @@
 package com.cyberelephant.bank.data
 
+import com.cyberelephant.bank.core.util.extension.toCESms
+import java.time.Instant
 import java.time.Instant.now
 
 class SmsRepository(
@@ -35,4 +37,14 @@ class SmsRepository(
         return sentSmsDao.allSentSms()
     }
 
+    suspend fun allSms(): List<CESms> = allReceivedSms().toCESms()
+        .plus(allSentSms().toCESms())
+        .sortedBy { it.date }
 }
+
+data class CESms(
+    val phoneNumber: String,
+    val message: String,
+    val isIncoming: Boolean,
+    val date: Instant
+)

@@ -111,7 +111,7 @@ fun MainPage(
 
         Button(
             modifier = Modifier.padding(vertical = verticalMargin), onClick = {
-                navController.navigate(CyberElephantRoutes.BANK_ACCOUNTS.name)
+                navController.navigate(bankAccountsRoute)
             }) {
             Text(text = stringResource(R.string.home_current_label))
         }
@@ -128,6 +128,13 @@ fun MainPage(
                 Toast.makeText(localContext, "TODO", Toast.LENGTH_SHORT).show()
             }) {
             Text(text = stringResource(R.string.home_export_label))
+        }
+
+        Button(
+            modifier = Modifier.padding(vertical = verticalMargin), onClick = {
+                navController.navigate(smsListRoute)
+            }) {
+            Text(text = stringResource(R.string.home_sms_list_label))
         }
 
         Button(

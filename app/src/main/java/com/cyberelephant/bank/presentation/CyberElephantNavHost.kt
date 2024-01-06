@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -18,6 +19,8 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,6 +30,8 @@ import com.cyberelephant.bank.presentation.accounts.BankAccountPage
 import com.cyberelephant.bank.presentation.accounts.BankAccountPageViewModel
 import com.cyberelephant.bank.presentation.accounts.ModifyBankAccountBottomSheet
 import com.cyberelephant.bank.presentation.accounts.ModifyBankAccountViewModel
+import com.cyberelephant.bank.presentation.sms_list.SmsListPage
+import com.cyberelephant.bank.presentation.sms_list.SmsListPageViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,9 +56,9 @@ fun CyberElephantNavHost() {
     }, content = { innerPadding: PaddingValues ->
         NavHost(
             navController = navController,
-            startDestination = CyberElephantRoutes.MAIN.name
+            startDestination = mainRoute
         ) {
-            composable(CyberElephantRoutes.MAIN.name) {
+            composable(mainRoute) {
                 appBarTitle.intValue = (R.string.app_name)
                 appBarActions.value = null
                 MainPage(
@@ -62,7 +67,7 @@ fun CyberElephantNavHost() {
                     viewModel = koinViewModel<MainPageViewModel>()
                 )
             }
-            composable(CyberElephantRoutes.BANK_ACCOUNTS.name) {
+            composable(bankAccountsRoute) {
                 appBarTitle.intValue = R.string.bank_account_title
                 appBarActions.value = AppBarActionState(actions = {
                     IconButton(onClick = {
@@ -77,6 +82,45 @@ fun CyberElephantNavHost() {
                     viewModel = koinViewModel<BankAccountPageViewModel>()
                 )
             }
+            composable(smsListRoute) {
+
+                val smsListPageViewModel = koinViewModel<SmsListPageViewModel>()
+                appBarTitle.intValue = R.string.sms_title
+                appBarActions.value = AppBarActionState(actions = {
+                    IconButton(onClick = {
+                        smsListPageViewModel.filterIncomingSms()
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_incoming_sms),
+                            contentDescription = stringResource(R.string.sms_list_incoming_sms_filter_accessibility),
+                            tint = Color.Red
+                        )
+                    }
+                    IconButton(onClick = {
+                        smsListPageViewModel.filterOutgoingSms()
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_outgoing_sms),
+                            contentDescription = stringResource(R.string.sms_list_outgoing_sms_filter_accessibility),
+                            tint = Color.Green
+                        )
+                    }
+                    IconButton(onClick = {
+                        smsListPageViewModel.allSms()
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_all_sms),
+                            contentDescription = stringResource(R.string.sms_list_all_sms_filter_accessibility),
+                            tint = Color.Black
+                        )
+                    }
+                })
+                SmsListPage(
+                    modifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
+                    navController = navController,
+                    viewModel = smsListPageViewModel,
+                )
+            }
         }
 
         if (showAddBankAccount.value) {
@@ -89,9 +133,8 @@ fun CyberElephantNavHost() {
     })
 }
 
-enum class CyberElephantRoutes {
-    MAIN,
-    BANK_ACCOUNTS
-}
+const val mainRoute: String = "main"
+const val bankAccountsRoute: String = "bankAccounts"
+const val smsListRoute: String = "smsList"
 
 data class AppBarActionState(val actions: (@Composable RowScope.() -> Unit)? = null)

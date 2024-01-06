@@ -46,7 +46,7 @@ fun BankAccountPage(
     viewModel: BankAccountPageViewModel
 ) {
 
-    val uiState by viewModel.loadAccounts().collectAsState(BankAccountLoading())
+    val uiState: BankAccountPageState by viewModel.loadAccounts().collectAsState(BankAccountLoading())
     val modifyBottomSheet = remember { mutableStateOf<UiBankAccount?>(null) }
 
     when (uiState) {
