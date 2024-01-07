@@ -30,6 +30,7 @@ import com.cyberelephant.bank.presentation.accounts.BankAccountPage
 import com.cyberelephant.bank.presentation.accounts.BankAccountPageViewModel
 import com.cyberelephant.bank.presentation.accounts.ModifyBankAccountBottomSheet
 import com.cyberelephant.bank.presentation.accounts.ModifyBankAccountViewModel
+import com.cyberelephant.bank.presentation.help.HelpPage
 import com.cyberelephant.bank.presentation.sms_list.SmsListPage
 import com.cyberelephant.bank.presentation.sms_list.SmsListPageViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -126,6 +127,15 @@ fun CyberElephantNavHost() {
                     viewModel = smsListPageViewModel,
                 )
             }
+            composable(helpRoute) {
+
+                appBarTitle.intValue = R.string.home_help_label
+                appBarActions.value = null
+                HelpPage(
+                    modifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
+                    navController = navController,
+                )
+            }
         }
 
         if (showAddBankAccount.value) {
@@ -141,5 +151,6 @@ fun CyberElephantNavHost() {
 const val mainRoute: String = "main"
 const val bankAccountsRoute: String = "bankAccounts"
 const val smsListRoute: String = "smsList"
+const val helpRoute: String = "help"
 
 data class AppBarActionState(val actions: (@Composable RowScope.() -> Unit)? = null)

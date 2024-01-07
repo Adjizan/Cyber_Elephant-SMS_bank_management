@@ -177,7 +177,7 @@ fun MainPage(
             ),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             onClick = {
-                Toast.makeText(localContext, "TODO", Toast.LENGTH_SHORT).show()
+                navController.navigate(helpRoute)
             }) {
             Text(text = stringResource(R.string.home_help_label))
         }
