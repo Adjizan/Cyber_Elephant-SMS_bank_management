@@ -48,7 +48,9 @@ fun CyberElephantNavHost() {
         TopAppBar(
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
-                titleContentColor = MaterialTheme.colorScheme.primary,
+                titleContentColor = Color.White,
+                actionIconContentColor = Color.White,
+                navigationIconContentColor = Color.White
             ), title = {
                 Text(text = stringResource(id = appBarTitle.intValue))
             }, actions = appBarActions.value?.actions ?: {}
@@ -73,7 +75,10 @@ fun CyberElephantNavHost() {
                     IconButton(onClick = {
                         showAddBankAccount.value = true
                     }) {
-                        Icons.Filled.Add
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = stringResource(R.string.bank_account_add)
+                        )
                     }
                 })
                 BankAccountPage(

@@ -1,6 +1,5 @@
 package com.cyberelephant.bank.presentation.accounts
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,20 +21,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.cyberelephant.bank.R
 import com.cyberelephant.bank.core.util.createRandomAccountNumber
 import com.cyberelephant.bank.presentation.theme.BankManagementTheme
-import com.cyberelephant.bank.presentation.theme.md_theme_dark_background
+import com.cyberelephant.bank.presentation.theme.cardBorder
+import com.cyberelephant.bank.presentation.theme.cardMinHeight
+import com.cyberelephant.bank.presentation.theme.negativeBalance
 import com.cyberelephant.bank.presentation.theme.normalMargin
+import com.cyberelephant.bank.presentation.theme.positiveBalance
 import com.cyberelephant.bank.presentation.theme.smallMargin
+import com.cyberelephant.bank.presentation.theme.textOnPrimary
 import com.cyberelephant.bank.presentation.theme.xSmallMargin
 import org.koin.androidx.compose.koinViewModel
 
@@ -46,7 +47,8 @@ fun BankAccountPage(
     viewModel: BankAccountPageViewModel
 ) {
 
-    val uiState: BankAccountPageState by viewModel.loadAccounts().collectAsState(BankAccountLoading())
+    val uiState: BankAccountPageState by viewModel.loadAccounts()
+        .collectAsState(BankAccountLoading())
     val modifyBottomSheet = remember { mutableStateOf<UiBankAccount?>(null) }
 
     when (uiState) {
@@ -83,10 +85,10 @@ private fun BankAccountsList(
     onClick: ((UiBankAccount) -> Unit)? = null
 ) {
     BankManagementTheme {
-        Box(Modifier.background(md_theme_dark_background)) {
+        Box {
             LazyColumn {
                 items(count = bankAccounts.count(), key = { bankAccounts[it].name }) {
-                    BankAccountRow(
+                    BankAccountCard(
                         bankAccounts[it],
                         onClick = onClick
                     )
@@ -97,15 +99,16 @@ private fun BankAccountsList(
 }
 
 @Composable
-fun BankAccountRow(uiBankAccount: UiBankAccount, onClick: ((UiBankAccount) -> Unit)? = null) {
+fun BankAccountCard(uiBankAccount: UiBankAccount, onClick: ((UiBankAccount) -> Unit)? = null) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(xSmallMargin)
-            .height(90.dp)
+            .height(cardMinHeight)
             .clickable {
                 onClick?.invoke(uiBankAccount)
             },
+        border = cardBorder
     ) {
         Row(
             modifier = Modifier
@@ -115,10 +118,8 @@ fun BankAccountRow(uiBankAccount: UiBankAccount, onClick: ((UiBankAccount) -> Un
         ) {
             val balance = uiBankAccount.balance
             val balanceColor = when {
-                balance > 0 -> colorResource(id = R.color.positive_balance)
-                else -> colorResource(
-                    id = R.color.negative_balance
-                )
+                balance > 0 -> positiveBalance
+                else -> negativeBalance
             }
 
             val subItemModifier = Modifier
@@ -136,7 +137,8 @@ fun BankAccountRow(uiBankAccount: UiBankAccount, onClick: ((UiBankAccount) -> Un
                     modifier = subItemModifier,
                     text = uiBankAccount.phoneNumber
                         ?: stringResource(id = R.string.account_cell_no_number),
-                    textAlign = TextAlign.Start
+                    textAlign = TextAlign.Start,
+                    color = textOnPrimary
                 )
                 Text(
                     modifier = subItemModifier,

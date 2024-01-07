@@ -1,6 +1,7 @@
 package com.cyberelephant.bank.presentation.theme
 
 import android.app.Activity
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -12,34 +13,21 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = md_theme_dark_primary,
-    onPrimary = md_theme_dark_onPrimary,
-    primaryContainer = md_theme_dark_primaryContainer,
-    onPrimaryContainer = md_theme_dark_onPrimaryContainer,
-    secondary = md_theme_dark_secondary,
-    onSecondary = md_theme_dark_onSecondary,
-    secondaryContainer = md_theme_dark_secondaryContainer,
-    onSecondaryContainer = md_theme_dark_onSecondaryContainer,
-    tertiary = md_theme_dark_tertiary,
-    onTertiary = md_theme_dark_onTertiary,
-    tertiaryContainer = md_theme_dark_tertiaryContainer,
-    onTertiaryContainer = md_theme_dark_onTertiaryContainer,
-    error = md_theme_dark_error,
-    errorContainer = md_theme_dark_errorContainer,
-    onError = md_theme_dark_onError,
-    onErrorContainer = md_theme_dark_onErrorContainer,
-    background = md_theme_dark_background,
-    onBackground = md_theme_dark_onBackground,
-    surface = md_theme_dark_surface,
-    onSurface = md_theme_dark_onSurface,
-    surfaceVariant = md_theme_dark_surfaceVariant,
-    onSurfaceVariant = md_theme_dark_onSurfaceVariant,
+    primary = textOnPrimary,
+    error = error,
+    onError = error,
+    errorContainer = error,
+    onErrorContainer = error,
+    onPrimary = textOnPrimary,
+    primaryContainer = primaryContainer,
+    onPrimaryContainer = onPrimaryContainer,
+    background = background,
+    onBackground = textOnPrimary,
+    surface = backgroundModal,
+    onSurface = textOnPrimary,
+    surfaceVariant = firefly,
+    onSurfaceVariant = textOnPrimary,
     outline = md_theme_dark_outline,
-    inverseOnSurface = md_theme_dark_inverseOnSurface,
-    inverseSurface = md_theme_dark_inverseSurface,
-    inversePrimary = md_theme_dark_inversePrimary,
-    surfaceTint = md_theme_dark_surfaceTint,
-    outlineVariant = md_theme_dark_outlineVariant,
     scrim = md_theme_dark_scrim,
 )
 
@@ -55,18 +43,18 @@ fun BankManagementTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
+            window.statusBarColor = colorScheme.primaryContainer.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
         }
     }
 
-    val colors = DarkColorScheme
-
     MaterialTheme(
-        colorScheme = colors,
+        colorScheme = DarkColorScheme,
         content = content
     )
 }
+
+val borderWidth = 1.dp
 
 val xSmallMargin = 6.dp
 val smallMargin = 8.dp
@@ -80,3 +68,8 @@ val horizontalMargin = normalMargin * 2
 val verticalMargin = normalMargin * 2
 
 val modalBottomSheet = 400.dp
+
+val roundedCornerRadius = 12.dp
+
+val cardBorder = BorderStroke(borderWidth, cardOutlined)
+val cardMinHeight = 90.dp

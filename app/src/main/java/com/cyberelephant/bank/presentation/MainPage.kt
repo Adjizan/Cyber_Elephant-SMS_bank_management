@@ -5,22 +5,29 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavHostController
 import com.cyberelephant.bank.R
+import com.cyberelephant.bank.presentation.theme.cardBorder
+import com.cyberelephant.bank.presentation.theme.roundedCornerRadius
+import com.cyberelephant.bank.presentation.theme.smallMargin
 import com.cyberelephant.bank.presentation.theme.verticalMargin
 import com.cyberelephant.bank.presentation.theme.xxxLargeMargin
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -109,36 +116,67 @@ fun MainPage(
     ) {
         VerifyPermissionPart(permissionsState)
 
-        Button(
-            modifier = Modifier.padding(vertical = verticalMargin), onClick = {
+        Button(modifier = Modifier
+            .padding(smallMargin)
+            .border(
+                cardBorder,
+                shape = RoundedCornerShape(roundedCornerRadius)
+            ),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+            onClick = {
                 navController.navigate(bankAccountsRoute)
             }) {
             Text(text = stringResource(R.string.home_current_label))
         }
 
-        Button(
-            modifier = Modifier.padding(vertical = verticalMargin), onClick = {
+        Button(modifier = Modifier
+            .padding(smallMargin)
+            .border(
+                cardBorder,
+                shape = RoundedCornerShape(roundedCornerRadius)
+            ),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+            onClick = {
                 chooseFileToImport.launch(arrayOf("text/comma-separated-values"))
             }) {
             Text(text = stringResource(R.string.home_import_label))
         }
 
         Button(
-            modifier = Modifier.padding(vertical = verticalMargin), onClick = {
+            modifier = Modifier
+                .padding(smallMargin)
+                .border(
+                    cardBorder,
+                    shape = RoundedCornerShape(roundedCornerRadius)
+                ),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+            onClick = {
                 Toast.makeText(localContext, "TODO", Toast.LENGTH_SHORT).show()
             }) {
             Text(text = stringResource(R.string.home_export_label))
         }
 
-        Button(
-            modifier = Modifier.padding(vertical = verticalMargin), onClick = {
+        Button(modifier = Modifier
+            .padding(smallMargin)
+            .border(
+                cardBorder,
+                shape = RoundedCornerShape(roundedCornerRadius)
+            ),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+            onClick = {
                 navController.navigate(smsListRoute)
             }) {
             Text(text = stringResource(R.string.home_sms_list_label))
         }
 
-        Button(
-            modifier = Modifier.padding(vertical = verticalMargin), onClick = {
+        Button(modifier = Modifier
+            .padding(smallMargin)
+            .border(
+                cardBorder,
+                shape = RoundedCornerShape(roundedCornerRadius)
+            ),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+            onClick = {
                 Toast.makeText(localContext, "TODO", Toast.LENGTH_SHORT).show()
             }) {
             Text(text = stringResource(R.string.home_help_label))

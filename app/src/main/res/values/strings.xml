@@ -54,4 +54,5 @@
     <string name="sms_list_incoming_sms_filter_accessibility">SMS entrants</string>
     <string name="sms_list_outgoing_sms_filter_accessibility">SMS sortants</string>
     <string name="sms_list_all_sms_filter_accessibility">Tous les SMS</string>
+    <string name="bank_account_add">Créer un compte bancaire</string>
 </resources>

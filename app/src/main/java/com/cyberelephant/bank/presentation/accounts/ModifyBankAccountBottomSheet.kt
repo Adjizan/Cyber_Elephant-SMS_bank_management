@@ -2,6 +2,7 @@ package com.cyberelephant.bank.presentation.accounts
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,10 +10,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -25,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -33,15 +37,16 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.cyberelephant.bank.R
 import com.cyberelephant.bank.core.util.ACCOUNT_NUMBER_LENGTH
 import com.cyberelephant.bank.core.util.PHONE_NUMBER_PREFIX
 import com.cyberelephant.bank.core.util.createRandomAccountNumber
 import com.cyberelephant.bank.domain.use_case.ModifyBankAccountParams
 import com.cyberelephant.bank.presentation.theme.BankManagementTheme
+import com.cyberelephant.bank.presentation.theme.cardBorder
 import com.cyberelephant.bank.presentation.theme.largeMargin
 import com.cyberelephant.bank.presentation.theme.modalBottomSheet
+import com.cyberelephant.bank.presentation.theme.roundedCornerRadius
 import com.cyberelephant.bank.presentation.theme.smallMargin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -189,7 +194,7 @@ fun ModifyBankAccountBottomSheet(
                         )
                     )
                     Row(modifier = Modifier.fillMaxWidth()) {
-                        Checkbox(checked = false, onCheckedChange = {
+                        Checkbox(checked = currentAccountFormData.value.isNPC, onCheckedChange = {
                             currentAccountFormData.value =
                                 currentAccountFormData.value.copy(isNPC = it)
                         })
@@ -207,13 +212,20 @@ fun ModifyBankAccountBottomSheet(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Button(
+                        modifier = Modifier
+                            .padding(smallMargin)
+                            .border(cardBorder, shape = RoundedCornerShape(roundedCornerRadius)),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                         onClick = { onDismiss?.invoke() },
-                        modifier = Modifier.padding(8.dp),
                     ) {
                         Text(stringResource(R.string.generic_cancel))
                     }
                     Button(
-                        modifier = Modifier.padding(8.dp), onClick = {
+                        modifier = Modifier
+                            .padding(smallMargin)
+                            .border(cardBorder, shape = RoundedCornerShape(roundedCornerRadius)),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                        onClick = {
                             validateForm(
                                 currentContext,
                                 currentAccountFormData.value,
@@ -223,7 +235,8 @@ fun ModifyBankAccountBottomSheet(
                                 onValidate,
                                 onDismiss
                             )
-                        }, enabled = currentAccountFormData.value.everythingSFine
+                        },
+                        enabled = currentAccountFormData.value.everythingSFine
                     ) {
                         Text(stringResource(R.string.add_account_sheet_validate_button_label))
                     }
@@ -289,7 +302,7 @@ private data class CurrentAccountFormData private constructor(
             balance: Double? = null,
             isNPC: Boolean = false
         ): CurrentAccountFormData {
-            val formattedBalance = "%.2f".format(balance)
+            val formattedBalance = balance?.let { "%.2f".format(it) } ?: run { "" }
             return CurrentAccountFormData(
                 name = TextFieldValue(name, selection = TextRange(name.length)),
                 accountNumber = TextFieldValue(

@@ -25,11 +25,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.cyberelephant.bank.R
 import com.cyberelephant.bank.domain.use_case.UiSms
 import com.cyberelephant.bank.presentation.theme.BankManagementTheme
+import com.cyberelephant.bank.presentation.theme.cardMinHeight
 import com.cyberelephant.bank.presentation.theme.md_theme_dark_background
 import com.cyberelephant.bank.presentation.theme.normalMargin
 import com.cyberelephant.bank.presentation.theme.xSmallMargin
@@ -45,7 +45,7 @@ fun SmsListPage(
     viewModel: SmsListPageViewModel,
 ) {
 
-    
+
     val uiState: SmsListPageState by viewModel.smsFlow.collectAsState(SmsListLoading())
 
     when (uiState) {
@@ -87,7 +87,7 @@ fun SmsRow(uiSms: UiSms) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(xSmallMargin)
-            .defaultMinSize(minHeight = 90.dp)
+            .defaultMinSize(minHeight = cardMinHeight)
     ) {
         Column(
             modifier = Modifier
