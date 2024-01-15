@@ -35,6 +35,10 @@ import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 
 @androidx.annotation.OptIn(UnstableApi::class)
@@ -106,6 +110,31 @@ fun MainPage(
             }
         }
 
+    val chooseFileToExport =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.CreateDocument("text/comma-separated-values")) { uri ->
+            uri?.let {
+                coroutineScope.launch {
+                    viewModel.exportBankCSVData(localContext.contentResolver, uri)
+                        .collect { success ->
+                            when (success) {
+                                true -> Toast.makeText(
+                                    localContext,
+                                    localContext.getString(R.string.bank_account_successful_export),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                false -> Toast.makeText(
+                                    localContext,
+                                    localContext.getString(R.string.bank_account_failed_export),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                }
+
+            }
+        }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -151,7 +180,14 @@ fun MainPage(
                 ),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             onClick = {
-                Toast.makeText(localContext, "TODO", Toast.LENGTH_SHORT).show()
+                chooseFileToExport.launch(
+                    "cyber-elephant_bank_${
+                        DateTimeFormatter.ofPattern("yyyyMMdd_hh:mm:ss")
+                            .withLocale(Locale.getDefault())
+                            .withZone(ZoneId.systemDefault())
+                            .format(Instant.now())
+                    }.csv"
+                )
             }) {
             Text(text = stringResource(R.string.home_export_label))
         }

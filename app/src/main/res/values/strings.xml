@@ -50,6 +50,8 @@
     <string name="bank_account_import_success">Import réussi</string>
     <string name="bank_account_import_failure">Import échoué</string>
     <string name="bank_account_import_in_progress">Import en cours</string>
+    <string name="bank_account_successful_export">Export réussi =)</string>
+    <string name="bank_account_failed_export">Export foiré =\'(</string>
     <string name="sms_title">Liste des SMS</string>
     <string name="sms_list_incoming_sms_filter_accessibility">SMS entrants</string>
     <string name="sms_list_outgoing_sms_filter_accessibility">SMS sortants</string>

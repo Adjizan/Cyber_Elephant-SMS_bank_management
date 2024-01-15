@@ -40,10 +40,10 @@ class ClearAndImportBankAccountsUseCase(private val bankAccountRepository: BankA
 
 }
 
-enum class BankAccountCsvIndex {
-    ACCOUNT_NUMBER_CSV_INDEX,
-    NAME_CSV_INDEX,
-    BALANCE_CSV_INDEX,
-    PHONE_NUMBER_CSV_INDEX,
-    NPC_CSV_INDEX,
+enum class BankAccountCsvIndex(val columnName: String) {
+    ACCOUNT_NUMBER_CSV_INDEX("Numéro de compte"),
+    NAME_CSV_INDEX("Nom"),
+    BALANCE_CSV_INDEX("Balance"),
+    PHONE_NUMBER_CSV_INDEX("Numéro de téléphone"),
+    NPC_CSV_INDEX("PNJ ?");
 }

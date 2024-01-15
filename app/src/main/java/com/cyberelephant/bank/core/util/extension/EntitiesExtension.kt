@@ -24,7 +24,8 @@ fun BankAccountEntity.toUi(): UiBankAccount = UiBankAccount(
     this.accountNumber,
     this.phoneNumber,
     this.name,
-    this.currentBalance
+    this.currentBalance,
+    this.isOrganizer
 )
 
 fun List<BankAccountEntity>.toUi(): List<UiBankAccount> = map { it.toUi() }

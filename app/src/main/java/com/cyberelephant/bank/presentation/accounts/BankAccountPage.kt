@@ -196,7 +196,8 @@ class UiBankAccountPreviewProvider : PreviewParameterProvider<List<UiBankAccount
                     null
                 },
                 names[it],
-                (-50000..50000).random().toDouble()
+                (-50000..50000).random().toDouble(),
+                it % 3 == 0
             )
         }.toList())
 
@@ -207,5 +208,10 @@ data class UiBankAccount(
     val accountNumber: String,
     val phoneNumber: String?,
     val name: String,
-    val balance: Double
-)
+    val balance: Double,
+    val isNPC: Boolean
+) {
+    fun toCsv(): String {
+        return "$accountNumber,$name,$balance,$phoneNumber,$isNPC"
+    }
+}

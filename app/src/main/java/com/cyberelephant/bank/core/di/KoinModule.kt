@@ -14,6 +14,7 @@ import com.cyberelephant.bank.domain.use_case.BadCommandUseCase
 import com.cyberelephant.bank.domain.use_case.ClearAndImportBankAccountsUseCase
 import com.cyberelephant.bank.domain.use_case.ConsultBalanceUseCase
 import com.cyberelephant.bank.domain.use_case.CreateBankAccountUseCase
+import com.cyberelephant.bank.domain.use_case.ExportBankAccountUseCase
 import com.cyberelephant.bank.domain.use_case.FundsTransferUseCase
 import com.cyberelephant.bank.domain.use_case.LoadAllBankAccountsUseCase
 import com.cyberelephant.bank.domain.use_case.RequireHelpUseCase
@@ -51,6 +52,7 @@ val cyberElephantModule = module {
     single<CreateBankAccountUseCase> { CreateBankAccountUseCase(get()) }
     single<UpdateBankAccountUseCase> { UpdateBankAccountUseCase(get()) }
     single<ClearAndImportBankAccountsUseCase> { ClearAndImportBankAccountsUseCase(get()) }
+    single<ExportBankAccountUseCase> { ExportBankAccountUseCase(get()) }
     single<ConsultBalanceUseCase> { ConsultBalanceUseCase(get()) }
     single<FundsTransferUseCase> { FundsTransferUseCase(get()) }
     single<RequireHelpUseCase> { RequireHelpUseCase(get()) }
@@ -61,7 +63,7 @@ val cyberElephantModule = module {
     single<SmsReceiver> {
         SmsReceiver()
     }
-    viewModel<MainPageViewModel> { MainPageViewModel(get()) }
+    viewModel<MainPageViewModel> { MainPageViewModel(get(), get()) }
     viewModel<BankAccountPageViewModel> { BankAccountPageViewModel(get()) }
     viewModel<ModifyBankAccountViewModel> { ModifyBankAccountViewModel(get(), get()) }
     viewModel<SmsListPageViewModel> { SmsListPageViewModel(get()) }
