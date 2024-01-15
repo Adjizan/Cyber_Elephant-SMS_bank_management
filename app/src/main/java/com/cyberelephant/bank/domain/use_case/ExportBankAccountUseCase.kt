@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import timber.log.Timber
 import java.io.OutputStream
-import java.nio.charset.Charset
 
 class ExportBankAccountUseCase(private val bankAccountRepository: BankAccountRepository) {
 
@@ -23,9 +22,9 @@ class ExportBankAccountUseCase(private val bankAccountRepository: BankAccountRep
             stringBuilder.appendLine()
             bankAccountEntities.toUi().forEach {
                 stringBuilder.appendLine(it.toCsv())
+
             }
-            outputStream.bufferedWriter(Charset.forName("UTF-8"))
-                .use { it.write(stringBuilder.toString()) }
+            outputStream.writer().use { it.write(stringBuilder.toString()) }
             true
         }
             .catch {

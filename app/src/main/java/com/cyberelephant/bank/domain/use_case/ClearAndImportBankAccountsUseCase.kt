@@ -40,6 +40,7 @@ class ClearAndImportBankAccountsUseCase(private val bankAccountRepository: BankA
 
 }
 
+// TODO I18N
 enum class BankAccountCsvIndex(val columnName: String) {
     ACCOUNT_NUMBER_CSV_INDEX("Numéro de compte"),
     NAME_CSV_INDEX("Nom"),

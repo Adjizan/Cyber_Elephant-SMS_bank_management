@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -22,7 +21,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavHostController
 import com.cyberelephant.bank.R
 import com.cyberelephant.bank.presentation.theme.cardBorder
@@ -41,9 +39,8 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 
-@androidx.annotation.OptIn(UnstableApi::class)
 @Composable
-@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalPermissionsApi::class)
 fun MainPage(
     navController: NavHostController,
     modifier: Modifier,
@@ -131,7 +128,6 @@ fun MainPage(
                             }
                         }
                 }
-
             }
         }
 
