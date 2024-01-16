@@ -51,8 +51,8 @@ dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-    implementation("androidx.media3:media3-common:1.2.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("androidx.media3:media3-common:1.2.1")
     implementation("com.jakewharton.timber:timber:5.0.1")
 
     implementation("androidx.activity:activity-compose:1.8.2")
@@ -64,11 +64,11 @@ dependencies {
     implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
     implementation("androidx.navigation:navigation-compose:2.7.6")
 
-    implementation("io.insert-koin:koin-android:3.5.2-RC1")
-    implementation("io.insert-koin:koin-core:3.5.2-RC1")
-    implementation("io.insert-koin:koin-android-compat:3.5.2-RC1")
-    implementation("io.insert-koin:koin-androidx-navigation:3.5.2-RC1")
-    implementation("io.insert-koin:koin-androidx-compose:3.5.2-RC1")
+    implementation("io.insert-koin:koin-android:3.5.3")
+    implementation("io.insert-koin:koin-core:3.5.3")
+    implementation("io.insert-koin:koin-android-compat:3.5.3")
+    implementation("io.insert-koin:koin-androidx-navigation:3.5.3")
+    implementation("io.insert-koin:koin-androidx-compose:3.5.3")
 
     implementation("androidx.room:room-runtime:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
