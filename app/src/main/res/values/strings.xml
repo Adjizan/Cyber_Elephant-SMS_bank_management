@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CE - SMS bank management</string>
+    <string name="app_name">CyBk</string>
     <string name="bank_account_title">Comptes en banque</string>
     <string name="generic_user_no_idea">Je ne sais pas ce qu\'il s\'est passé *_*</string>
     <string name="home_current_label">Voir les données actuelles</string>
