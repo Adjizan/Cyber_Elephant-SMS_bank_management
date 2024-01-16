@@ -1,4 +1,4 @@
-package com.cyberelephant.bank.presentation.theme
+﻿package com.cyberelephant.bank.presentation.theme
 
 import android.app.Activity
 import androidx.compose.foundation.BorderStroke

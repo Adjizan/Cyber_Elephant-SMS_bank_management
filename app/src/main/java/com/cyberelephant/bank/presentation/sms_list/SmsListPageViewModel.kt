@@ -1,4 +1,4 @@
-package com.cyberelephant.bank.presentation.sms_list
+﻿package com.cyberelephant.bank.presentation.sms_list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

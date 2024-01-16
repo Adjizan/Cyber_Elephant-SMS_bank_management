@@ -1,4 +1,4 @@
-package com.cyberelephant.bank.presentation.accounts
+﻿package com.cyberelephant.bank.presentation.accounts
 
 import androidx.lifecycle.ViewModel
 import com.cyberelephant.bank.domain.use_case.LoadAllBankAccountsUseCase

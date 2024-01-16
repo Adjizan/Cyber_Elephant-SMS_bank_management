@@ -1,4 +1,4 @@
-package com.cyberelephant.bank
+﻿package com.cyberelephant.bank
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -339,7 +339,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
         smsManager?.sendTextMessage(phoneNumber, null, message, null, null) ?: run {
             Toast.makeText(
                 context,
-                "Je n'ai pas réussi à récupérer le SMS Manager",
+                "Je n'ai pas rÃ©ussi Ã  rÃ©cupÃ©rer le SMS Manager",
                 Toast.LENGTH_SHORT
             ).show()
         }

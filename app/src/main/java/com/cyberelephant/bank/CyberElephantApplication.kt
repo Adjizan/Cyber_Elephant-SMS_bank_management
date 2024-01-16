@@ -1,4 +1,4 @@
-package com.cyberelephant.bank
+﻿package com.cyberelephant.bank
 
 import android.app.Application
 import com.cyberelephant.bank.core.di.cyberElephantModule

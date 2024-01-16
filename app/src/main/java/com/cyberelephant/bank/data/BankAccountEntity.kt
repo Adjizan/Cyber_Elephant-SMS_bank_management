@@ -1,4 +1,4 @@
-package com.cyberelephant.bank.data
+﻿package com.cyberelephant.bank.data
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

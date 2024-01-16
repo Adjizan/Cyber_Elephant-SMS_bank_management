@@ -1,7 +1,6 @@
-package com.cyberelephant.bank.domain.use_case
+﻿package com.cyberelephant.bank.domain.use_case
 
 import com.cyberelephant.bank.data.Command
-import kotlin.reflect.full.createInstance
 
 class VerifyCommandUseCase {
 

@@ -1,4 +1,4 @@
-package com.cyberelephant.bank.core.util.extension
+﻿package com.cyberelephant.bank.core.util.extension
 
 import android.content.BroadcastReceiver
 import kotlinx.coroutines.CoroutineScope

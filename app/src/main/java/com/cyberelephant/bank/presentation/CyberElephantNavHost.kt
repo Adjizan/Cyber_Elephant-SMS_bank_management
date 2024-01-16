@@ -1,4 +1,4 @@
-package com.cyberelephant.bank.presentation
+﻿package com.cyberelephant.bank.presentation
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.PaddingValues

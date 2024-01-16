@@ -1,4 +1,4 @@
-package com.cyberelephant.bank.domain.use_case
+﻿package com.cyberelephant.bank.domain.use_case
 
 import com.cyberelephant.bank.core.util.extension.toUi
 import com.cyberelephant.bank.data.BankAccountRepository
@@ -18,11 +18,10 @@ class ExportBankAccountUseCase(private val bankAccountRepository: BankAccountRep
             val stringBuilder: StringBuilder = StringBuilder("#")
             stringBuilder.append(
                 BankAccountCsvIndex.entries.joinToString(separator = ",") { it.columnName }
-            )
-            stringBuilder.appendLine()
+            ).appendLine()
+
             bankAccountEntities.toUi().forEach {
                 stringBuilder.appendLine(it.toCsv())
-
             }
             outputStream.writer().use { it.write(stringBuilder.toString()) }
             true
