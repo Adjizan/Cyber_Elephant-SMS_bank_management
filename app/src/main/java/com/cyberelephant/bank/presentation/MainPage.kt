@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavHostController
 import com.cyberelephant.bank.R
+import com.cyberelephant.bank.presentation.theme.background
 import com.cyberelephant.bank.presentation.theme.cardBorder
 import com.cyberelephant.bank.presentation.theme.roundedCornerRadius
 import com.cyberelephant.bank.presentation.theme.smallMargin
@@ -236,12 +237,15 @@ private fun VerifyPermissionPart(permissionsState: MultiplePermissionsState) {
             text = stringResource(R.string.home_permission_denied_label, refusedPermissions),
             textAlign = TextAlign.Center,
         )
-        Button(modifier = Modifier.padding(vertical = verticalMargin), onClick = {
-            permissionsState.launchMultiplePermissionRequest()
-        }) {
+        Button(modifier = Modifier
+            .padding(smallMargin),
+            onClick = {
+                permissionsState.launchMultiplePermissionRequest()
+            }
+        ) {
             Text(
                 text = stringResource(R.string.home_give_permission_label),
-                modifier = Modifier.padding(vertical = verticalMargin),
+                color = background
             )
         }
     }

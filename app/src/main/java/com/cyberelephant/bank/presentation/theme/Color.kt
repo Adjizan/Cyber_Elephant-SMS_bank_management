@@ -3,10 +3,6 @@ package com.cyberelephant.bank.presentation.theme
 import androidx.compose.ui.graphics.Color
 
 
-val md_theme_dark_error = Color(0xFFFFB4AB)
-val md_theme_dark_errorContainer = Color(0xFF93000A)
-val md_theme_dark_onError = Color(0xFF690005)
-val md_theme_dark_onErrorContainer = Color(0xFFFFDAD6)
 val md_theme_dark_background = Color(0xFF2B0052)
 val md_theme_dark_outline = Color(0xFF9B8D94)
 val md_theme_dark_scrim = Color(0xFF000000)
@@ -17,7 +13,6 @@ val mexicanRed = Color(0xFFB12323)
 val valencia = Color(0xFFD62E2E)
 val firefly = Color(0xFF09111F)
 val bigStone = Color(0xFF101C35)
-val ebony = Color(0xFF03070C)
 val violet = Color(0xFF1A0632)
 
 
