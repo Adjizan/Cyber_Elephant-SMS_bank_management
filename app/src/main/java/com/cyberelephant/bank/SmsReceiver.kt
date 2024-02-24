@@ -147,32 +147,23 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
         originalMessage: String,
         badCommandAttemptedHelp: String?
     ) {
-        lateinit var internalFeedback: String
-        lateinit var userFeedback: String
         badCommandAttemptedHelp?.let {
-            internalFeedback = context.getString(
+            val internalFeedback: String = context.getString(
                 R.string.bad_command_recognized_internal_feedback,
                 phoneNumber,
                 originalMessage
             )
-            userFeedback = context.getString(
+            val userFeedback: String = context.getString(
                 R.string.bad_command_recognized_user_feedback,
                 badCommandAttemptedHelp
             )
-        } ?: run {
-            internalFeedback = context.getString(
-                R.string.bad_command_not_recognized_internal_feedback,
-                phoneNumber,
-                originalMessage
+            operationCallback(
+                context = context,
+                internalFeedback = internalFeedback,
+                userFeedback = userFeedback,
+                phoneNumber = phoneNumber
             )
-            userFeedback = context.getString(R.string.bad_command_not_recognized_user_feedback)
         }
-        operationCallback(
-            context = context,
-            internalFeedback = internalFeedback,
-            userFeedback = userFeedback,
-            phoneNumber = phoneNumber
-        )
     }
 
     private fun handleHelp(
