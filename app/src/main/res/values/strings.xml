@@ -26,7 +26,7 @@
     <string name="transfer_money_internal_insufficient_balance">Opération refusée.\nSolde insuffisant</string>
     <string name="transfer_money_user_feedback_success">Opération effectuée avec succès, votre nouveau solde : %1$.2f crédits</string>
     <string name="transfer_money_other_feedback_success">Virement de %1$.2f crédits reçu de la part de %2$s. Nouveau solde : %3$.2f</string>
-    <string name="transfer_money_internal_feedback_success">Virement de %1$.2f crédits réalisé\nDE $2%s\nVERS %3$s</string>
+    <string name="transfer_money_internal_feedback_success">Virement de %1$.2f crédits réalisé\nDE %2$s\nVERS %3$s</string>
     <string name="transfer_money_internal_feedback_to_unlinked_account">Virement effectué vers un compte existant mais non-rattaché à un numéro de téléphone\nSource du virement : %1$s\nCompte destination : $2%s</string>
     <string name="transfer_money_internal_not_npc_account">Opération refusée. Le compte %1$s n\'est pas un compte PNJ.</string>
     <string name="consult_help_user_success">Bonjour !\nVoici la liste des différentes commandes :\n%1$s</string>

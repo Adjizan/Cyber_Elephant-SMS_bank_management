@@ -33,10 +33,12 @@ import com.cyberelephant.bank.presentation.theme.cardMinHeight
 import com.cyberelephant.bank.presentation.theme.md_theme_dark_background
 import com.cyberelephant.bank.presentation.theme.normalMargin
 import com.cyberelephant.bank.presentation.theme.xSmallMargin
+import timber.log.Timber
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+
 
 @Composable
 fun SmsListPage(
@@ -66,6 +68,12 @@ fun SmsListPage(
 @Preview
 @Composable
 private fun SmsList(@PreviewParameter(UiSmsPreviewProvider::class) smsList: List<UiSms>) {
+
+    val withZone = DateTimeFormatter
+        .ofPattern("hh:mm dd/MM/yyyy")
+        .withLocale(Locale.getDefault())
+        .withZone(ZoneId.systemDefault())
+
     BankManagementTheme {
         Box(Modifier.background(md_theme_dark_background)) {
             LazyColumn {
@@ -73,7 +81,7 @@ private fun SmsList(@PreviewParameter(UiSmsPreviewProvider::class) smsList: List
                     count = smsList.count(),
                     key = { "$it${smsList[it].phoneNumber}${smsList[it].message}" }) {
                     SmsRow(
-                        smsList[it],
+                        smsList[it], withZone
                     )
                 }
             }
@@ -82,7 +90,9 @@ private fun SmsList(@PreviewParameter(UiSmsPreviewProvider::class) smsList: List
 }
 
 @Composable
-fun SmsRow(uiSms: UiSms) {
+fun SmsRow(uiSms: UiSms, withZone: DateTimeFormatter) {
+    Timber.d(uiSms.date.toString())
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -100,11 +110,7 @@ fun SmsRow(uiSms: UiSms) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = DateTimeFormatter
-                        .ofPattern("hh:MM dd/mm/yyyy")
-                        .withLocale(Locale.getDefault())
-                        .withZone(ZoneId.systemDefault())
-                        .format(uiSms.date)
+                    text = withZone.format(uiSms.date)
                 )
                 Icon(
                     painter = painterResource(
@@ -116,9 +122,9 @@ fun SmsRow(uiSms: UiSms) {
                     ),
                     contentDescription = "Incoming message",
                     tint = (if (uiSms.isIncoming) {
-                        Color.Green
-                    } else {
                         Color.Red
+                    } else {
+                        Color.Green
                     })
                 )
             }

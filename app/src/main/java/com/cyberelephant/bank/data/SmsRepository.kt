@@ -39,7 +39,7 @@ class SmsRepository(
 
     suspend fun allSms(): List<CESms> = allReceivedSms().toCESms()
         .plus(allSentSms().toCESms())
-        .sortedBy { it.date }
+        .sortedByDescending { it.date }
 }
 
 data class CESms(

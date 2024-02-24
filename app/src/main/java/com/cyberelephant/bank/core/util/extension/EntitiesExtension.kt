@@ -33,7 +33,7 @@ fun List<BankAccountEntity>.toUi(): List<UiBankAccount> = map { it.toUi() }
 fun SentSmsEntity.toCESms(): CESms = CESms(
     phoneNumber = toPhoneNumber,
     message = message,
-    date = Instant.ofEpochMilli(this.sentAt),
+    date = Instant.ofEpochMilli(sentAt),
     isIncoming = false
 )
 
@@ -43,8 +43,8 @@ fun List<SentSmsEntity>.toCESms(): List<CESms> = map { it.toCESms() }
 fun ReceivedSmsEntity.toCESms(): CESms = CESms(
     phoneNumber = fromPhoneNumber,
     message = message,
-    date = Instant.ofEpochMilli(this.receivedAt),
-    isIncoming = false
+    date = Instant.ofEpochMilli(receivedAt),
+    isIncoming = true
 )
 
 @JvmName("receivedSmsToCESms")
