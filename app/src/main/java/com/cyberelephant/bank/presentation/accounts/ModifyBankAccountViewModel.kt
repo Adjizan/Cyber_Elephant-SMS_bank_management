@@ -25,7 +25,7 @@ class ModifyBankAccountViewModel(
     fun modifyBankAccount(params: ModifyBankAccountParams, isNewAccount: Boolean): Flow<Boolean?> {
 
         val toSave = params.phoneNumber?.let { phoneNumber ->
-            if (phoneNumber.first() == '0') {
+            if (phoneNumber.isNotBlank() && phoneNumber.first() == '0') {
                 params.copy(phoneNumber = phoneNumber.replaceFirstChar { "${PHONE_NUMBER_PREFIX}$it" })
             } else {
                 params

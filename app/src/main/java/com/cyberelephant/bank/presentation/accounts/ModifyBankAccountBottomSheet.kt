@@ -323,7 +323,7 @@ private data class CurrentAccountFormData private constructor(
 private fun CurrentAccountFormData.toUseCaseParams() = ModifyBankAccountParams(
     name = name.text.trim(),
     accountNumber = accountNumber.text.trim(),
-    phoneNumber = phoneNumber.text.trim(),
+    phoneNumber = if (phoneNumber.text.isBlank()) null else phoneNumber.text.trim(),
     balance = try {
         balance.text.toDouble()
     } catch (e: NumberFormatException) {
