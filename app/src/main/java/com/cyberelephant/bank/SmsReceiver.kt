@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Looper
 import android.telephony.SmsManager
 import android.telephony.SmsMessage
 import android.widget.Toast
@@ -316,12 +317,13 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
         userFeedback: String? = null,
         phoneNumber: String? = null
     ) {
-        Toast.makeText(
-            context,
-            internalFeedback,
-            Toast.LENGTH_SHORT
-        ).show()
-
+        Looper.getMainLooper().run {
+            Toast.makeText(
+                context,
+                internalFeedback,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
         if (userFeedback != null && phoneNumber != null) {
             sendSms(context, userFeedback, phoneNumber)
         }
@@ -341,11 +343,13 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
             SmsManager.getDefault()
         }
         smsManager?.sendTextMessage(phoneNumber, null, message, null, null) ?: run {
-            Toast.makeText(
-                context,
-                "Je n'ai pas réussi à récupérer le SMS Manager",
-                Toast.LENGTH_SHORT
-            ).show()
+            Looper.getMainLooper().run {
+                Toast.makeText(
+                    context,
+                    "Je n'ai pas réussi à récupérer le SMS Manager",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
