@@ -1,6 +1,6 @@
 ﻿package com.cyberelephant.bank.data
 
-// All "helps" should be done otherwise for a better I18N but... for now, it 
+// All "helps" should be done otherwise for a better I18N but... for now, it will be enough
 sealed class Command {
     abstract val instruction: String
     abstract val pattern: String
@@ -26,7 +26,7 @@ data object NewUserCommand : Command() {
     override val pattern: String
         get() = "^$instruction (\\w+)$"
     override val help: String
-        get() = "S'inscrire : Inscription [NUMÃ‰RO_DE_COMPTE]"
+        get() = "S'inscrire : Inscription [NUMÉRO_DE_COMPTE]"
 }
 
 data object ConsultBalanceCommand : Command() {
@@ -44,7 +44,7 @@ data object TransferCommand : Command() {
     override val pattern: String
         get() = "^$instruction (\\w+) (\\d+)$"
     override val help: String
-        get() = "Transfert des fonds : Virement [NUMÃ‰RO_DE_COMPTE_DESTINATAIRE] [MONTANT]"
+        get() = "Transfert des fonds : Virement [NUMÉRO_DE_COMPTE_DESTINATAIRE] [MONTANT]"
 }
 
 data object NPCTransferCommand : Command() {
@@ -53,7 +53,7 @@ data object NPCTransferCommand : Command() {
     override val pattern: String
         get() = "^$instruction (\\w)+ (\\w+) (\\d+)$"
     override val help: String
-        get() = "Transfert des fonds PNJ : Virement PNJ [NUMÃ‰RO_DE_COMPTE_PNJ] [NUMÃ‰RO_DE_COMPTE_DESTINATAIRE] [MONTANT]"
+        get() = "Transfert des fonds PNJ : Virement PNJ [NUMÉRO_DE_COMPTE_PNJ] [NUMÉRO_DE_COMPTE_DESTINATAIRE] [MONTANT]"
     override val forOrganizerOnly: Boolean
         get() = true
 }
