@@ -71,7 +71,7 @@ private fun SmsList(@PreviewParameter(UiSmsPreviewProvider::class) smsList: List
             LazyColumn {
                 items(
                     count = smsList.count(),
-                    key = { "${smsList[it].phoneNumber}${smsList[it].message}" }) {
+                    key = { "$it${smsList[it].phoneNumber}${smsList[it].message}" }) {
                     SmsRow(
                         smsList[it],
                     )
