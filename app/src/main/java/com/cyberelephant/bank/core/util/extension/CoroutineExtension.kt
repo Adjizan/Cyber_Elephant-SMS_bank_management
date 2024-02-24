@@ -1,6 +1,7 @@
 ﻿package com.cyberelephant.bank.core.util.extension
 
 import android.content.BroadcastReceiver
+import android.content.BroadcastReceiver.PendingResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -13,12 +14,12 @@ fun BroadcastReceiver.goAsync(
     callback: (() -> Unit)? = null,
     block: suspend CoroutineScope.() -> Unit
 ) {
-    val pendingResult = goAsync()
+    val pendingResult: PendingResult? = goAsync()
     CoroutineScope(SupervisorJob()).launch(context) {
         try {
             block()
         } finally {
-            pendingResult.finish()
+            pendingResult?.finish()
             launch(Dispatchers.Main) { callback?.invoke() }
         }
     }

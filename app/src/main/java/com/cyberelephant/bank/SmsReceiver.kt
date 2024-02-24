@@ -29,9 +29,9 @@ import com.cyberelephant.bank.domain.use_case.RequireHelpUseCase
 import com.cyberelephant.bank.domain.use_case.SaveReceivedSmsUseCase
 import com.cyberelephant.bank.domain.use_case.SaveSentSmsUseCase
 import com.cyberelephant.bank.domain.use_case.VerifyCommandUseCase
+import kotlinx.coroutines.CoroutineExceptionHandler
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import timber.log.Timber
 
 class SmsReceiver : BroadcastReceiver(), KoinComponent {
 
@@ -71,20 +71,37 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                 SmsMessage.createFromPdu(pdus[0], pdusFormat).originatingAddress!!
             val originalMessage = message.toString()
 
-            goAsync { saveReceivedSmsUseCase.call(originatingAddress, originalMessage) }
+            val exceptionHandler =
+                CoroutineExceptionHandler { _, throwable ->
+                    handleException(
+                        context,
+                        throwable,
+                        originatingAddress,
+                        ::operationCallback
+                    )
+                }
+
+            goAsync(exceptionHandler) {
+                saveReceivedSmsUseCase.call(
+                    originatingAddress,
+                    originalMessage
+                )
+            }
 
             verifyCommandUseCase.call(originalMessage)?.let { command ->
                 when (command) {
                     ConsultBalanceCommand -> handleConsultBalance(
                         context,
+                        exceptionHandler,
                         originatingAddress
                     )
 
-                    HelpCommand -> handleHelp(context, originatingAddress)
+                    HelpCommand -> handleHelp(context, exceptionHandler, originatingAddress)
 
                     NewUserCommand -> {
                         handleNewUser(
                             context,
+                            exceptionHandler,
                             AddUserParam.from(
                                 command.verify(originalMessage)!!,
                                 originatingAddress
@@ -94,6 +111,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
 
                     TransferCommand -> handleFundsTransfer(
                         context,
+                        exceptionHandler,
                         FundsTransferParam.fromPC(
                             originatingAddress,
                             command.verify(originalMessage)!!
@@ -103,6 +121,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
 
                     NPCTransferCommand -> handleFundsTransfer(
                         context,
+                        exceptionHandler,
                         FundsTransferParam.fromNPC(
                             command.verify(originalMessage)!!,
                         ),
@@ -155,48 +174,46 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
         )
     }
 
-    private fun handleHelp(context: Context, phoneNumber: String) {
+    private fun handleHelp(
+        context: Context,
+        exceptionHandler: CoroutineExceptionHandler,
+        phoneNumber: String
+    ) {
         lateinit var internalFeedback: String
         lateinit var userFeedback: String
-        goAsync(callback = {
+        goAsync(context = exceptionHandler, callback = {
             operationCallback(
                 context = context,
                 internalFeedback = internalFeedback,
                 userFeedback = userFeedback,
-                phoneNumber = phoneNumber
+                phoneNumber = phoneNumber,
             )
         }) {
-            try {
-                internalFeedback =
-                    context.getString(R.string.consult_help_internal_feedback, phoneNumber)
-                userFeedback = context.getString(
-                    R.string.consult_help_user_success,
-                    requireHelpUseCase.call(phoneNumber).joinToString { "- $it\n" }
-                )
-            } catch (e: Exception) {
-                Timber.e(e)
-                val feedbacks = handleException(context, e)
-                internalFeedback = feedbacks.first
-                userFeedback = feedbacks.second!!
-            }
+            internalFeedback =
+                context.getString(R.string.consult_help_internal_feedback, phoneNumber)
+            userFeedback = context.getString(
+                R.string.consult_help_user_success,
+                requireHelpUseCase.call(phoneNumber).joinToString { "- $it\n" }
+            )
         }
 
     }
 
     private fun handleFundsTransfer(
         context: Context,
+        exceptionHandler: CoroutineExceptionHandler,
         fundsTransferParam: FundsTransferParam,
         originatingPhoneNumber: String,
     ) {
         lateinit var internalFeedback: String
         var userFeedback: String? = null
         lateinit var toOther: TransferSuccessful
-        goAsync(callback = {
+        goAsync(context = exceptionHandler, callback = {
             operationCallback(
                 context = context,
                 internalFeedback = internalFeedback,
                 userFeedback = userFeedback,
-                phoneNumber = originatingPhoneNumber
+                phoneNumber = originatingPhoneNumber,
             )
 
             toOther.destinationPhoneNumber?.let {
@@ -222,91 +239,74 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
             }
 
         }) {
-            try {
-                toOther = fundsTransferUseCase.call(fundsTransferParam)
-                if (fundsTransferParam.originatingPhoneNumber != null) {
-                    userFeedback =
-                        context.getString(
-                            R.string.transfer_money_user_feedback_success,
-                            toOther.newBalanceOriginatingAccount
-                        )
-                }
-                internalFeedback =
+            toOther = fundsTransferUseCase.call(fundsTransferParam)
+            if (fundsTransferParam.originatingPhoneNumber != null) {
+                userFeedback =
                     context.getString(
-                        R.string.transfer_money_internal_feedback_success,
-                        fundsTransferParam.amount,
-                        fundsTransferParam.originatingPhoneNumber
-                            ?: fundsTransferParam.originatingBankAccount,
-                        fundsTransferParam.destinationBankAccount
+                        R.string.transfer_money_user_feedback_success,
+                        toOther.newBalanceOriginatingAccount
                     )
-            } catch (e: Exception) {
-                Timber.e(e)
-                val feedbacks = handleException(context, e)
-                internalFeedback = feedbacks.first
             }
+            internalFeedback =
+                context.getString(
+                    R.string.transfer_money_internal_feedback_success,
+                    fundsTransferParam.amount,
+                    fundsTransferParam.originatingPhoneNumber
+                        ?: fundsTransferParam.originatingBankAccount,
+                    fundsTransferParam.destinationBankAccount
+                )
         }
     }
 
-    private fun handleConsultBalance(context: Context, phoneNumber: String) {
+    private fun handleConsultBalance(
+        context: Context,
+        exceptionHandler: CoroutineExceptionHandler,
+        phoneNumber: String
+    ) {
         lateinit var internalFeedback: String
         lateinit var userFeedback: String
-        goAsync(callback = {
+        goAsync(context = exceptionHandler, callback = {
             operationCallback(
                 context = context,
                 internalFeedback = internalFeedback,
                 userFeedback = userFeedback,
-                phoneNumber = phoneNumber
+                phoneNumber = phoneNumber,
             )
         }) {
-            try {
-                internalFeedback =
-                    context.getString(R.string.consult_balance_internal_success, phoneNumber)
-                val nameBalance = consultBalanceUseCase.call(phoneNumber)
-                userFeedback = context.getString(
-                    R.string.consult_balance_user_success,
-                    nameBalance.first,
-                    nameBalance.second,
-                )
-            } catch (e: Exception) {
-                Timber.e(e)
-                val feedbacks = handleException(context, e)
-                internalFeedback = feedbacks.first
-                userFeedback = feedbacks.second!!
-            }
+            internalFeedback =
+                context.getString(R.string.consult_balance_internal_success, phoneNumber)
+            val nameBalance = consultBalanceUseCase.call(phoneNumber)
+            userFeedback = context.getString(
+                R.string.consult_balance_user_success,
+                nameBalance.first,
+                nameBalance.second,
+            )
         }
     }
 
 
     private fun handleNewUser(
         context: Context,
+        exceptionHandler: CoroutineExceptionHandler,
         addUserParam: AddUserParam
     ) {
         lateinit var internalFeedback: String
         lateinit var userFeedback: String
-        goAsync(callback = {
+        goAsync(context = exceptionHandler, callback = {
             operationCallback(
                 context = context,
                 internalFeedback = internalFeedback,
                 userFeedback = userFeedback,
-                phoneNumber = addUserParam.phoneNumber
+                phoneNumber = addUserParam.phoneNumber,
             )
         }) {
-            try {
-
-                val name = associatePhoneNumberUseCase.call(addUserParam)
-                internalFeedback = context.getString(
-                    R.string.link_phone_and_account_internal_success,
-                    addUserParam.bankAccount,
-                    addUserParam.phoneNumber
-                )
-                userFeedback = context.getString(R.string.link_phone_and_account_user_success, name)
-
-            } catch (e: Exception) {
-                Timber.e(e)
-                val feedbacks = handleException(context, e)
-                internalFeedback = feedbacks.first
-                userFeedback = feedbacks.second!!
-            }
+            val name = associatePhoneNumberUseCase.call(addUserParam)
+            internalFeedback = context.getString(
+                R.string.link_phone_and_account_internal_success,
+                addUserParam.bankAccount,
+                addUserParam.phoneNumber
+            )
+            userFeedback = context.getString(R.string.link_phone_and_account_user_success, name)
         }
     }
 
@@ -327,7 +327,11 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
         }
     }
 
-    private fun sendSms(context: Context, message: String, phoneNumber: String) {
+    private fun sendSms(
+        context: Context,
+        message: String,
+        phoneNumber: String
+    ) {
         goAsync { saveSentSmsUseCase.call(phoneNumber, message) }
 
         val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -339,7 +343,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
         smsManager?.sendTextMessage(phoneNumber, null, message, null, null) ?: run {
             Toast.makeText(
                 context,
-                "Je n'ai pas rÃ©ussi Ã  rÃ©cupÃ©rer le SMS Manager",
+                "Je n'ai pas réussi à récupérer le SMS Manager",
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -351,16 +355,18 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
      */
     private fun handleException(
         context: Context,
-        e: Exception,
+        throwable: Throwable,
+        incomingPhoneNumber: String?,
+        callback: ((Context, String, String?, String?) -> Unit)? = null,
     ): Pair<String, String?> {
         val internalFeedback: String
         val userFeedback: String?
-        when (e) {
+        when (throwable) {
             is BankAccountAlreadyLinked -> {
                 internalFeedback = context.getString(
                     R.string.link_phone_and_account_internal_already_linked,
-                    e.bankAccount,
-                    e.otherPhoneNumber
+                    throwable.bankAccount,
+                    throwable.otherPhoneNumber
                 )
                 userFeedback =
                     context.getString(R.string.link_phone_and_account_user_already_linked)
@@ -368,7 +374,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
 
             is BankAccountUnknown -> {
                 internalFeedback = context.getString(
-                    R.string.link_phone_and_account_internal_unknown, e.bankAccount
+                    R.string.link_phone_and_account_internal_unknown, throwable.bankAccount
                 )
                 userFeedback =
                     context.getString(R.string.link_phone_and_account_user_unknown)
@@ -377,7 +383,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
             is PhoneNumberUnknown -> {
                 internalFeedback = context.getString(
                     R.string.sms_operation_unknown_internal,
-                    e.phoneNumber
+                    throwable.phoneNumber
                 )
                 userFeedback = context.getString(R.string.sms_operation_unknown_user)
             }
@@ -393,7 +399,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                 internalFeedback =
                     context.getString(
                         R.string.transfer_money_internal_not_npc_account,
-                        e.bankAccount
+                        throwable.bankAccount
                     )
                 userFeedback = null
             }
@@ -406,6 +412,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                     context.getString(R.string.generic_user_no_idea)
             }
         }
+        callback?.invoke(context, internalFeedback, userFeedback, incomingPhoneNumber)
         return Pair(
             internalFeedback,
             userFeedback
